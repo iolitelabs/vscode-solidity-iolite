@@ -184,6 +184,10 @@
       {
         "command": "solidity.network.deployContract",
         "title": "Solidity: Deploy Current Solidity Contract"
+      },
+      {
+        "command": "solidity.network.getBalance",
+        "title": "Solidity: Get Balance of Current Wallet"
       }
     ],
     "keybindings": [
