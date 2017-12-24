@@ -32,22 +32,34 @@ export function deployContract() {
     const contractName = path.parse(editor.document.fileName).name;
     const contractJsonPath = path.join(binPath, 'contracts', contractName + '.json');
 
-    if ( ! fs.existsSync(contractJsonPath)) {
+    if (!fs.existsSync(contractJsonPath)) {
         vscode.window.showWarningMessage('You need to compile the contract first');
         return;
     }
 
-    cleanOutput();
-    printlnOutput("Deploy started");
-    
+    // cleanOutput();
+    printlnOutput("\nDeploy started");
+
     const settings = getSettings();
     outfit.deploy(settings.address, JSON.parse(fs.readFileSync(contractJsonPath, 'utf8'))).then(emiter => {
         emiter.on('transactionHash', transactionHash => {
-
+            printlnOutput("TX HASH: " + transactionHash);
+            printlnOutput("Wait until will be mined ...");
         }).on('receipt', receipt => {
-
+            printlnOutput("SUCCESS: Contract address: " + receipt.contractAddress);
         }).on('error', error => {
             printlnOutput("FAIL: " + error.message);
         })
     });
+}
+
+export function getBalance() {
+    const settings = getSettings();
+
+    web3.eth.getBalance(settings.address)
+        .then(balance => {
+            printlnOutput("Balance of " + settings.address + " is " + web3.utils.fromWei(balance, "ether") + " ETH");
+        }).catch(error => {
+            printlnOutput("FAIL: " + error.message);
+        });
 }
