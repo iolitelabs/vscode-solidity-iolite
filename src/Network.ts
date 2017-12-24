@@ -47,7 +47,7 @@ export function deployContract() {
         }).on('receipt', receipt => {
 
         }).on('error', error => {
-            printlnOutput(error.message);
+            printlnOutput("FAIL: " + error.message);
         })
     });
 }

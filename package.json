@@ -32,8 +32,7 @@
     "onLanguage:solidity",
     "onCommand:solidity.compile",
     "onCommand:solidity.compile.active",
-    "onCommand:solidity.codegen",
-    "onCommand:extension.sayHello"
+    "onCommand:solidity.codegen"
   ],
   "main": "./out/src/extension",
   "scripts": {
@@ -75,7 +74,7 @@
             "address": "",
             "host": "https://ropsten.infura.io/"
           },
-          "description": "Ethereum address"
+          "description": "Network settings"
         },
         "solidity.compileUsingRemoteVersion": {
           "type": [
