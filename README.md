@@ -1,3 +1,9 @@
+# Development
+```
+npm install
+./node_modules/.bin/electron-rebuild -v 1.7.9 
+```
+
 # Solidity support for Visual Studio code
 Solidity is the language used in Ethereum to create smart contracts, this extension provides: 
 
