@@ -188,8 +188,31 @@
       {
         "command": "solidity.network.getBalance",
         "title": "Solidity: Get Balance of Current Wallet"
+      },
+      {
+        "command": "solidity.network.callMethod",
+        "title": "Solidity: Call Current Method"
       }
     ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "solidity.network.getBalance",
+          "when": "editorTextFocus && editorLangId == 'solidity'",
+          "group": "navigation"
+        },
+        {
+          "command": "solidity.network.deployContract",
+          "when": "editorTextFocus && editorLangId == 'solidity'",
+          "group": "navigation"
+        },
+        {
+          "command": "solidity.network.callMethod",
+          "when": "editorTextFocus && editorLangId == 'solidity'",
+          "group": "navigation"
+        }
+      ]
+    },
     "keybindings": [
       {
         "command": "solidity.compile.active",
