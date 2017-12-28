@@ -44,8 +44,17 @@ export function getSettings(): NetworkSettings {
     return settings;
 }
 
+export function setContractAddress(address: string) {
+    let settings = getSettings();
+
+    settings.contract = address;
+
+    vscode.workspace.getConfiguration('solidity').update('network', settings);
+}
+
 export declare interface NetworkSettings {
     privateKey: string;
     address: string;
     host: string;
+    contract: string; //TODO: extend with name
 }

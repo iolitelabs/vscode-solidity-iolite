@@ -6,7 +6,7 @@ import {compileAllContracts} from './compileAll';
 import {compileActiveContract, initDiagnosticCollection} from './compileActive';
 import {codeGenerate} from './codegen';
 import {LanguageClient, LanguageClientOptions, ServerOptions, TransportKind, RevealOutputChannelOn} from 'vscode-languageclient';
-import { deployContract, getBalance } from './Network';
+import { deployContract, getBalance, callMethod } from './Network';
 
 let diagnosticCollection: vscode.DiagnosticCollection;
 
@@ -35,6 +35,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(vscode.commands.registerCommand('solidity.network.getBalance', (args: any[]) => {
         getBalance();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('solidity.network.callMethod', (args: any[]) => {
+        callMethod();
     }));
 
     const serverModule = path.join(__dirname, 'server.js');
