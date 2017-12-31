@@ -96,14 +96,14 @@ export function callMethod() {
         return element.name === word;
     });
 
-    if( ! methodAbi) {
+    if ( ! methodAbi) {
         vscode.window.showWarningMessage('You need to select method to call');
         return;
     }
 
     const settings = getSettings();
 
-    if( ! settings.contract) {
+    if ( ! settings.contract) {
         vscode.window.showWarningMessage('You need to deploy contract first');
         return;
     }
@@ -120,20 +120,26 @@ export function callMethod() {
         if ( ! value) {
             return;
         }
-        // TODO: implement smarter parser
-        // if bytes then web3.utils.stringToHex(params[0])
-        // .....
-        const params = value.split(',').map(el => el.trim());
 
-        if(params.length !== methodAbi.inputs.length) {
+        let params = [];
+        try {
+            params = JSON.parse('[' + value + ']');
+        } catch (e) {
+            printlnOutput('Error encoding arguments: ' + e);
+            return;
+        }
+
+        if (params.length !== methodAbi.inputs.length) {
             vscode.window.showErrorMessage('Wrong number of parameters');
             return;
         }
         console.log(params);
 
+        const preparedParams = prepareValues(methodAbi.inputs.map(el => el.type), params);
+
         outfit.call(settings.address,
             { abi: contractAbi, address: settings.contract },
-            { name: methodAbi.name, params: params })
+            { name: methodAbi.name, params: preparedParams }) //.map(el => web3.utils.stringToHex(el))
             .then(emiter => {
                 emiter.on('call', result => {
                     printlnOutput("CALL RESULT: " + result);
@@ -155,4 +161,28 @@ export function callMethod() {
 export interface ContractObject {
     abi: string;
     bytecode: string;
+}
+
+function prepareSingle(type, value) {
+    if (value instanceof Array) {
+        const prepared = [];
+        for (let i in value) {
+            prepared.push(prepareSingle(type, value[i]));
+        }
+        return prepared;
+    } 
+
+    if (type.includes('bytes')) {
+        return web3.utils.stringToHex(value);
+    }
+    
+    return value;
+}
+
+function prepareValues(types, values): Array<any> {
+    const prepared = [];
+    for (let i in types) {
+        prepared.push(prepareSingle(types[i], values[i]));
+    }
+    return prepared
 }

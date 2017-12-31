@@ -32,15 +32,20 @@ function ContractsOutfit(web3) {
       .then(output => {
         const emiter = new EventEmitter()
         resolveGlobal(emiter)
-
-        return output.sendObject.send({
-          from: address,
-          gas: Math.round(output.gasAmount * 1.01),
-          gasPrice: output.gasPrice
+        setImmediate(() => {
+          try {
+            return output.sendObject.send({
+              from: address,
+              gas: Math.round(output.gasAmount * 1.01),
+              gasPrice: output.gasPrice
+            })
+              .on('error', error => emiter.emit('error', error))
+              .on('transactionHash', transactionHash => emiter.emit('transactionHash', transactionHash))
+              .on('receipt', receipt => emiter.emit('receipt', receipt))
+          } catch (err) {
+            return emiter.emit('error', err)
+          }
         })
-        .on('error', error => emiter.emit('error', error))
-        .on('transactionHash', transactionHash => emiter.emit('transactionHash', transactionHash))
-        .on('receipt', receipt => emiter.emit('receipt', receipt))
       })
       .catch(reason => {
         rejectGlobal(reason)
@@ -68,12 +73,17 @@ function ContractsOutfit(web3) {
       return new Promise((resolve, reject) => {
         const emiter = new EventEmitter()
         resolve(emiter)
-
-        methodObject.call({ from: address}, (err, result) => {
-          if (err) {
+        setImmediate(() => {
+          try {
+            methodObject.call({ from: address }, (err, result) => {
+              if (err) {
+                return emiter.emit('error', err)
+              }
+              emiter.emit('call', result)
+            })
+          } catch (err) {
             return emiter.emit('error', err)
           }
-          emiter.emit('call', result)
         })
       })
     } else {
