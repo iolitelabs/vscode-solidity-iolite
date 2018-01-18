@@ -116,24 +116,22 @@ export function callMethod() {
         placeHolder: methodPlaceHolder
     }
 
-    vscode.window.showInputBox(options).then(value => {
-        if ( ! value) {
-            return;
-        }
-
+    const callMethodWithParams = function (valueParams) {
         let params = [];
-        try {
-            params = JSON.parse('[' + value + ']');
-        } catch (e) {
-            printlnOutput('Error encoding arguments: ' + e);
-            return;
+
+        if (valueParams) {
+            try {
+                params = JSON.parse('[' + valueParams + ']');
+            } catch (e) {
+                printlnOutput('Error encoding arguments: ' + e);
+                return;
+            }
         }
 
         if (params.length !== methodAbi.inputs.length) {
             vscode.window.showErrorMessage('Wrong number of parameters');
             return;
         }
-        console.log(params);
 
         const preparedParams = prepareValues(methodAbi.inputs.map(el => el.type), params);
 
@@ -143,19 +141,33 @@ export function callMethod() {
             .then(emiter => {
                 emiter.on('call', result => {
                     printlnOutput("CALL RESULT: " + result);
+                    if (methodAbi.outputs.length === 1 && methodAbi.outputs[0].type.includes('bytes')) {
+                        printlnOutput("RESULT AS STRING: " + web3.utils.hexToString(result));
+                    }
                 }).on('transactionHash', transactionHash => {
                     printlnOutput("TX HASH: " + transactionHash);
                     printlnOutput("Wait until will be mined ...");
                 }).on('receipt', receipt => {
-                    printlnOutput("SUCCESS: Contract address: " + receipt.contractAddress);
-                    setContractAddress(receipt.contractAddress);
+                    printlnOutput("SUCCESS: Gas used: " + receipt.gasUsed);
                 }).on('error', error => {
                     printlnOutput("FAIL: " + error.message);
                 })
             }).catch(error => {
                 printlnOutput("FAIL: " + error.message);
             });
-    });
+    }
+
+    if (methodAbi.inputs.length) {
+        vscode.window.showInputBox(options).then(value => {
+            if (!value) {
+                return;
+            }
+
+            callMethodWithParams(value);
+        });
+    } else {
+        callMethodWithParams(null);
+    }
 }
 
 export interface ContractObject {
