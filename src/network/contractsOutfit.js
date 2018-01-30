@@ -30,6 +30,18 @@ function ContractsOutfit(web3) {
         })
       })
       .then(output => {
+        return new Promise((resolve, reject) => {
+          web3.eth.getTransactionCount(address, "pending", (err, nextNonce) => {
+            if (err) {
+              return reject(err)
+            }
+
+            output.nextNonce = nextNonce
+            resolve(output)
+          })
+        })
+      })
+      .then(output => {
         const emiter = new EventEmitter()
         resolveGlobal(emiter)
         setImmediate(() => {
@@ -37,7 +49,8 @@ function ContractsOutfit(web3) {
             return output.sendObject.send({
               from: address,
               gas: Math.round(output.gasAmount * 1.01),
-              gasPrice: output.gasPrice
+              gasPrice: output.gasPrice,
+              nonce: output.nextNonce
             })
               .on('error', error => emiter.emit('error', error))
               .on('transactionHash', transactionHash => emiter.emit('transactionHash', transactionHash))
