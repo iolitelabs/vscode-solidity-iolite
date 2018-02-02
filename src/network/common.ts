@@ -1,11 +1,12 @@
 'use strict';
 import * as vscode from 'vscode';
-import Web3 = require('web3');
+import * as Web3 from 'web3';
 import { OutputChannel } from 'vscode';
 
 let outputChannel: OutputChannel = null;
 
-export const web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/'));
+const _Web3 = Web3 as any;
+export const web3 = new _Web3(new _Web3.providers.HttpProvider('https://ropsten.infura.io/'));
 
 function getOutputChannel(): OutputChannel {
     if (!outputChannel) {
