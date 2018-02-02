@@ -49,23 +49,48 @@ export function deployContract() {
         return;
     }
 
-    // cleanOutput();
-    printlnOutput("\nDeploy started");
-
-    const settings = getSettings();
-    outfit.deploy(settings.address, contract).then(emiter => {
-        emiter.on('transactionHash', transactionHash => {
-            printlnOutput("TX HASH: " + transactionHash);
-            printlnOutput("Wait until will be mined ...");
-        }).on('receipt', receipt => {
-            printlnOutput("SUCCESS: Contract address: " + receipt.contractAddress);
-            setContractAddress(receipt.contractAddress);
-        }).on('error', error => {
-            printlnOutput("FAIL: " + error.message);
-        })
-    }).catch(error => {
-        printlnOutput("FAIL: " + error.message);
+    const contractAbi = JSON.parse(contract.abi);
+    const constructorAbi = contractAbi.find(element => {
+        return element.type === "constructor";
     });
+
+    const options: InputBoxOptions = {
+        prompt: "Enter parameters ",
+        placeHolder: getMethodPlaceHolder(constructorAbi)
+    }
+
+    const deployWithParams = function (params) {
+        const preparedParams = parseParams(constructorAbi, params);
+
+        if ( ! preparedParams) {
+            return;
+        }
+
+        // cleanOutput();
+        printlnOutput("\nDeploy started");
+
+        const settings = getSettings();
+        outfit.deploy(settings.address, contract, preparedParams).then(emiter => {
+            emiter.on('transactionHash', transactionHash => {
+                printlnOutput("TX HASH: " + transactionHash);
+                printlnOutput("Wait until will be mined ...");
+            }).on('receipt', receipt => {
+                printlnOutput("SUCCESS: Contract address: " + receipt.contractAddress);
+                setContractAddress(receipt.contractAddress);
+            }).on('error', error => {
+                printlnOutput("FAIL: " + error.message);
+            })
+        }).catch(error => {
+            printlnOutput("FAIL: " + error.message);
+        });
+    }
+
+    if (constructorAbi && constructorAbi.inputs.length) {
+        vscode.window.showInputBox(options)
+            .then(value => value && deployWithParams(value));
+    } else {
+        deployWithParams(null);
+    }
 }
 
 export function getBalance() {
@@ -108,32 +133,17 @@ export function callMethod() {
         return;
     }
 
-    const methodPlaceHolder = methodAbi.inputs.map(el => el.type + ' ' + el.name).join(', ');
-    console.log(methodPlaceHolder);
-
     const options: InputBoxOptions = {
-        prompt: "Enter parametres ",
-        placeHolder: methodPlaceHolder
+        prompt: "Enter parameters ",
+        placeHolder: getMethodPlaceHolder(methodAbi)
     }
 
-    const callMethodWithParams = function (valueParams) {
-        let params = [];
+    const callMethodWithParams = function (params) {
+        const preparedParams = parseParams(methodAbi, params);
 
-        if (valueParams) {
-            try {
-                params = JSON.parse('[' + valueParams + ']');
-            } catch (e) {
-                printlnOutput('Error encoding arguments: ' + e);
-                return;
-            }
-        }
-
-        if (params.length !== methodAbi.inputs.length) {
-            vscode.window.showErrorMessage('Wrong number of parameters');
+        if ( ! preparedParams) {
             return;
         }
-
-        const preparedParams = prepareValues(methodAbi.inputs.map(el => el.type), params);
 
         outfit.call(settings.address,
             { abi: contractAbi, address: settings.contract },
@@ -158,13 +168,8 @@ export function callMethod() {
     }
 
     if (methodAbi.inputs.length) {
-        vscode.window.showInputBox(options).then(value => {
-            if (!value) {
-                return;
-            }
-
-            callMethodWithParams(value);
-        });
+        vscode.window.showInputBox(options)
+            .then(value => value && callMethodWithParams(value));
     } else {
         callMethodWithParams(null);
     }
@@ -197,4 +202,32 @@ function prepareValues(types, values): Array<any> {
         prepared.push(prepareSingle(types[i], values[i]));
     }
     return prepared
+}
+
+function getMethodPlaceHolder(methodAbi): string {
+    return methodAbi ? methodAbi.inputs.map(el => el.type + ' ' + el.name).join(', ') : "";
+}
+
+function parseParams(methodAbi, valueParams: string): Array<any> {
+    if ( ! methodAbi) {
+        return [];
+    }
+
+    let params = [];
+
+    if (valueParams) {
+        try {
+            params = JSON.parse('[' + valueParams + ']');
+        } catch (e) {
+            printlnOutput('Error encoding arguments: ' + e);
+            return null;
+        }
+    }
+
+    if (params.length !== methodAbi.inputs.length) {
+        vscode.window.showErrorMessage('Wrong number of parameters');
+        return null;
+    }
+
+    return prepareValues(methodAbi.inputs.map(el => el.type), params);
 }
