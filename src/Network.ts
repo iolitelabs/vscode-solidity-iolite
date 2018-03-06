@@ -55,8 +55,8 @@ export function deployContract() {
     });
 
     const options: InputBoxOptions = {
-        prompt: 'Enter parameters ',
         placeHolder: getMethodPlaceHolder(constructorAbi),
+        prompt: 'Enter parameters ',
     };
 
     const deployWithParams = function (params) {
@@ -67,23 +67,23 @@ export function deployContract() {
         }
 
         // cleanOutput();
-        printlnOutput("\nDeploy started");
+        printlnOutput('\nDeploy started');
 
         const settings = getSettings();
         outfit.deploy(settings.address, contract, preparedParams).then(emiter => {
             emiter.on('transactionHash', transactionHash => {
-                printlnOutput("TX HASH: " + transactionHash);
-                printlnOutput("Wait until will be mined ...");
+                printlnOutput('TX HASH: ' + transactionHash);
+                printlnOutput('Wait until will be mined ...');
             }).on('receipt', receipt => {
-                printlnOutput("SUCCESS: Contract address: " + receipt.contractAddress);
+                printlnOutput('SUCCESS: Contract address: ' + receipt.contractAddress);
                 setContractAddress(receipt.contractAddress);
             }).on('error', error => {
-                printlnOutput("FAIL: " + error.message);
-            })
+                printlnOutput('FAIL: ' + error.message);
+            });
         }).catch(error => {
-            printlnOutput("FAIL: " + error.message);
+            printlnOutput('FAIL: ' + error.message);
         });
-    }
+    };
 
     if (constructorAbi && constructorAbi.inputs.length) {
         vscode.window.showInputBox(options)
@@ -98,9 +98,9 @@ export function getBalance() {
 
     web3.eth.getBalance(settings.address)
         .then(balance => {
-            printlnOutput("Balance of " + settings.address + " is " + web3.utils.fromWei(balance, "ether") + " ETH");
+            printlnOutput('Balance of ' + settings.address + ' is ' + web3.utils.fromWei(balance, 'ether') + ' ETH');
         }).catch(error => {
-            printlnOutput("FAIL: " + error.message);
+            printlnOutput('FAIL: ' + error.message);
         });
 }
 
@@ -134,9 +134,9 @@ export function callMethod() {
     }
 
     const options: InputBoxOptions = {
-        prompt: "Enter parameters ",
-        placeHolder: getMethodPlaceHolder(methodAbi)
-    }
+        placeHolder: getMethodPlaceHolder(methodAbi),
+        prompt: 'Enter parameters ',
+    };
 
     const callMethodWithParams = function (params) {
         const preparedParams = parseParams(methodAbi, params);
@@ -147,25 +147,25 @@ export function callMethod() {
 
         outfit.call(settings.address,
             { abi: contractAbi, address: settings.contract },
-            { name: methodAbi.name, params: preparedParams }) //.map(el => web3.utils.stringToHex(el))
+            { name: methodAbi.name, params: preparedParams }) // .map(el => web3.utils.stringToHex(el))
             .then(emiter => {
                 emiter.on('call', result => {
-                    printlnOutput("CALL RESULT: " + result);
+                    printlnOutput('CALL RESULT: ' + result);
                     if (methodAbi.outputs.length === 1 && methodAbi.outputs[0].type.includes('bytes')) {
-                        printlnOutput("RESULT AS STRING: " + web3.utils.hexToString(result));
+                        printlnOutput('RESULT AS STRING: ' + web3.utils.hexToString(result));
                     }
                 }).on('transactionHash', transactionHash => {
-                    printlnOutput("TX HASH: " + transactionHash);
-                    printlnOutput("Wait until will be mined ...");
+                    printlnOutput('TX HASH: ' + transactionHash);
+                    printlnOutput('Wait until will be mined ...');
                 }).on('receipt', receipt => {
-                    printlnOutput("SUCCESS: Gas used: " + receipt.gasUsed);
+                    printlnOutput('SUCCESS: Gas used: ' + receipt.gasUsed);
                 }).on('error', error => {
-                    printlnOutput("FAIL: " + error.message);
-                })
+                    printlnOutput('FAIL: ' + error.message);
+                });
             }).catch(error => {
-                printlnOutput("FAIL: " + error.message);
+                printlnOutput('FAIL: ' + error.message);
             });
-    }
+    };
 
     if (methodAbi.inputs.length) {
         vscode.window.showInputBox(options)
@@ -185,14 +185,13 @@ function prepareSingle(type, value) {
         const prepared = [];
         for (let i in value) {
             prepared.push(prepareSingle(type, value[i]));
-        }
+        };
         return prepared;
-    } 
+    }
 
     if (type.includes('bytes')) {
         return web3.utils.stringToHex(value);
     }
-    
     return value;
 }
 
@@ -201,7 +200,7 @@ function prepareValues(types, values): Array<any> {
     for (let i in types) {
         prepared.push(prepareSingle(types[i], values[i]));
     }
-    return prepared
+    return prepared;
 }
 
 function getMethodPlaceHolder(methodAbi): string {
