@@ -10,7 +10,7 @@ export const web3 = new _Web3(new _Web3.providers.HttpProvider('https://ropsten.
 
 function getOutputChannel(): OutputChannel {
     if (!outputChannel) {
-        outputChannel = vscode.window.createOutputChannel("Ethereum");
+        outputChannel = vscode.window.createOutputChannel('Ethereum');
     }
     return outputChannel;
 }
@@ -41,14 +41,16 @@ export function getSettings(): NetworkSettings {
 
     web3.eth.accounts.wallet.clear();
     web3.eth.accounts.wallet.add(settings.privateKey);
-    
     return settings;
 }
 
-export function setContractAddress(address: string) {
+export function addContractAddress(name: string, address: string) {
     let settings = getSettings();
 
-    settings.contract = address;
+    if (! settings.contract) {
+        settings.contract = {};
+    }
+    settings.contract[name] = address;
 
     vscode.workspace.getConfiguration('solidity').update('network', settings);
 }
@@ -57,5 +59,5 @@ export declare interface NetworkSettings {
     privateKey: string;
     address: string;
     host: string;
-    contract: string; //TODO: extend with name
+    contract: { [key: string]: string; };
 }
