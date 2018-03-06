@@ -4,18 +4,17 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as ContractsOutfit from './network/contractsOutfit';
 import * as projService from './projectService';
-import { web3, getSettings, cleanOutput, printlnOutput, setContractAddress } from './network/common';
+import { web3, getSettings, cleanOutput, printlnOutput, addContractAddress } from './network/common';
 import { error } from 'util';
 import { InputBoxOptions } from 'vscode';
 
 const outfit = ContractsOutfit(web3);
 
-function getContractJson(): ContractObject | null {
+function getContractJson(contractName: string): ContractObject | null {
     const editor = vscode.window.activeTextEditor;
 
     const project = projService.initialiseProject(vscode.workspace.rootPath);
     const binPath = path.join(vscode.workspace.rootPath, project.projectPackage.build_dir);
-    const contractName = path.parse(editor.document.fileName).name;
     const contractJsonPath = path.join(binPath, 'contracts', contractName + '.json');
 
     if ( ! fs.existsSync(contractJsonPath)) {
@@ -43,7 +42,8 @@ export function deployContract() {
         return;
     }
 
-    const contract = getContractJson();
+    const contractName = path.parse(editor.document.fileName).name;
+    const contract = getContractJson(contractName);
     if ( ! contract) {
         vscode.window.showWarningMessage('You need to compile the contract first');
         return;
@@ -76,7 +76,7 @@ export function deployContract() {
                 printlnOutput('Wait until will be mined ...');
             }).on('receipt', receipt => {
                 printlnOutput('SUCCESS: Contract address: ' + receipt.contractAddress);
-                setContractAddress(receipt.contractAddress);
+                addContractAddress(contractName, receipt.contractAddress);
             }).on('error', error => {
                 printlnOutput('FAIL: ' + error.message);
             });
@@ -107,7 +107,7 @@ export function getBalance() {
 export function callMethod() {
     const editor = vscode.window.activeTextEditor;
 
-    const contract = getContractJson();
+    const contract = getContractJson(path.parse(editor.document.fileName).name);
     if ( ! contract) {
         vscode.window.showWarningMessage('You need to compile the contract first');
         return;
@@ -185,7 +185,7 @@ function prepareSingle(type, value) {
         const prepared = [];
         for (let i in value) {
             prepared.push(prepareSingle(type, value[i]));
-        };
+        }
         return prepared;
     }
 
@@ -204,7 +204,7 @@ function prepareValues(types, values): Array<any> {
 }
 
 function getMethodPlaceHolder(methodAbi): string {
-    return methodAbi ? methodAbi.inputs.map(el => el.type + ' ' + el.name).join(', ') : "";
+    return methodAbi ? methodAbi.inputs.map(el => el.type + ' ' + el.name).join(', ') : '';
 }
 
 function parseParams(methodAbi, valueParams: string): Array<any> {
