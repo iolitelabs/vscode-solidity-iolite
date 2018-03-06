@@ -51,13 +51,13 @@ export function deployContract() {
 
     const contractAbi = JSON.parse(contract.abi);
     const constructorAbi = contractAbi.find(element => {
-        return element.type === "constructor";
+        return element.type === 'constructor';
     });
 
     const options: InputBoxOptions = {
-        prompt: "Enter parameters ",
-        placeHolder: getMethodPlaceHolder(constructorAbi)
-    }
+        prompt: 'Enter parameters ',
+        placeHolder: getMethodPlaceHolder(constructorAbi),
+    };
 
     const deployWithParams = function (params) {
         const preparedParams = parseParams(constructorAbi, params);
