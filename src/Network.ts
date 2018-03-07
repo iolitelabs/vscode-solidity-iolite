@@ -94,6 +94,7 @@ export function deployContract() {
 }
 
 export function getBalance() {
+    console.log('Hello');
     const settings = getSettings();
 
     web3.eth.getBalance(settings.address)
@@ -107,7 +108,8 @@ export function getBalance() {
 export function callMethod() {
     const editor = vscode.window.activeTextEditor;
 
-    const contract = getContractJson(path.parse(editor.document.fileName).name);
+    const contractName = path.parse(editor.document.fileName).name;
+    const contract = getContractJson(contractName);
     if ( ! contract) {
         vscode.window.showWarningMessage('You need to compile the contract first');
         return;
@@ -128,7 +130,7 @@ export function callMethod() {
 
     const settings = getSettings();
 
-    if ( ! settings.contract) {
+    if ( ! settings.contracts[contractName]) {
         vscode.window.showWarningMessage('You need to deploy contract first');
         return;
     }
@@ -146,7 +148,7 @@ export function callMethod() {
         }
 
         outfit.call(settings.address,
-            { abi: contractAbi, address: settings.contract },
+            { abi: contractAbi, address: settings.contracts[contractName] },
             { name: methodAbi.name, params: preparedParams }) // .map(el => web3.utils.stringToHex(el))
             .then(emiter => {
                 emiter.on('call', result => {
