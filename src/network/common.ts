@@ -2,6 +2,7 @@
 import * as vscode from 'vscode';
 import * as Web3 from 'web3';
 import { OutputChannel } from 'vscode';
+import { Position, Range } from 'vscode-languageserver/lib/main';
 
 let outputChannel: OutputChannel = null;
 
@@ -47,17 +48,18 @@ export function getSettings(): NetworkSettings {
 export function addContractAddress(name: string, address: string) {
     let settings = getSettings();
 
-    if (! settings.contract) {
-        settings.contract = {};
+    if (! settings.contracts) {
+        settings.contracts = {};
     }
-    settings.contract[name] = address;
+    settings.contracts[name] = address;
 
     vscode.workspace.getConfiguration('solidity').update('network', settings);
 }
+
 
 export declare interface NetworkSettings {
     privateKey: string;
     address: string;
     host: string;
-    contract: { [key: string]: string; };
+    contracts: { [key: string]: string; };
 }
