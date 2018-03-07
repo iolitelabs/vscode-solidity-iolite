@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as ContractsOutfit from './network/contractsOutfit';
 import * as projService from './projectService';
-import { web3, getSettings, cleanOutput, printlnOutput, addContractAddress } from './network/common';
+import { web3, getSettings, cleanOutput, printlnOutput, addContractAddress, getCurrentContractName } from './network/common';
 import { error } from 'util';
 import { InputBoxOptions } from 'vscode';
 
@@ -42,7 +42,7 @@ export function deployContract() {
         return;
     }
 
-    const contractName = path.parse(editor.document.fileName).name;
+    const contractName = getCurrentContractName();
     const contract = getContractJson(contractName);
     if ( ! contract) {
         vscode.window.showWarningMessage('You need to compile the contract first');
@@ -108,7 +108,7 @@ export function getBalance() {
 export function callMethod() {
     const editor = vscode.window.activeTextEditor;
 
-    const contractName = path.parse(editor.document.fileName).name;
+    const contractName = getCurrentContractName();
     const contract = getContractJson(contractName);
     if ( ! contract) {
         vscode.window.showWarningMessage('You need to compile the contract first');
