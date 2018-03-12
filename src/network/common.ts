@@ -82,13 +82,26 @@ function getMatchingBracket(text: String, startBracketPosition: number): number 
 }
 
 /**
+ * Replace all comments and string literals within a given string.
+ * Not modifies the input data.
+ * @param source input string
+ * @returns processed string without string literals and comments
+ */
+function replaceCommentsAndStrings(source: string): string {
+    // regex that matches respectively: double quotes, quotes,
+    // one-line comments, multiline comments:
+    const re = /((((?=[^\\])"([^"]|\\")*[^\\])")|((?=[^\\])'([^']|\\')*[^\\]')|(\/\/[^\n]*\n)|(\/\*(.|\n)*\*\/))/g;
+    const substitutionSymbol = ' ';
+    return source.replace(re, (x) => substitutionSymbol.repeat(x.length));
+}
+/**
  * @returns start of contract in scope of which cursor is located
  *          or null if cursor is not in contract scope
 */
 function getCurrentContractStart(): number | null {
     const editor = vscode.window.activeTextEditor;
     const selection = editor.selection;
-    const text = editor.document.getText(null);
+    const text = replaceCommentsAndStrings(editor.document.getText());
     const position = editor.document.offsetAt(selection.active);
 
     let i = 0;
