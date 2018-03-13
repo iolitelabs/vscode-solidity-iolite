@@ -66,11 +66,7 @@ export function deployContract() {
             return;
         }
 
-        // cleanOutput();
-        printlnOutput('\nDeploy started');
-
-        const settings = getSettings();
-        outfit.deploy(settings.address, contract, preparedParams).then(emiter => {
+        outfit.deploy(getSettings().address, contract, preparedParams).then(emiter => {
             emiter.on('transactionHash', transactionHash => {
                 printlnOutput('TX HASH: ' + transactionHash);
                 printlnOutput('Wait until will be mined ...');
@@ -130,7 +126,7 @@ export function callMethod() {
 
     const settings = getSettings();
 
-    if ( ! settings.contracts[contractName]) {
+    if ( !(settings.contracts && settings.contracts[contractName])) {
         vscode.window.showWarningMessage('You need to deploy contract first');
         return;
     }
