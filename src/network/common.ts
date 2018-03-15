@@ -11,6 +11,8 @@ let outputChannel: OutputChannel = null;
 const _Web3 = Web3 as any;
 export const web3 = new _Web3(new _Web3.providers.HttpProvider('https://ropsten.infura.io/'));
 
+const SHA256_HEX_LENGTH = 64;
+
 function getOutputChannel(): OutputChannel {
     if (!outputChannel) {
         outputChannel = vscode.window.createOutputChannel('Ethereum');
@@ -58,9 +60,18 @@ export function addContractAddress(name: string, address: string) {
 
 
 /**
+ * Calculate sha256 checksum for a given string
+ * @param str string for calculating checksum
+ * @returns sha256 checksum in hex format
+*/
+function checksum(str: string): string {
+    return crypto.createHash('sha256').update(str).digest('hex');
+}
+
+/**
  * Creates new Ethereum account, saves public key and encrypted with a given
- * password private key to settings and return the last one unencrypted
- * for further use
+ * password private key (along with sha256 checksum for password validation)
+ * to settings and return the last one unencrypted for further use
  * @param encryptionPassword password for private key encryption
  * @param settings to which info about account will be saved
  * @returns private key of created account
@@ -74,13 +85,15 @@ function createNewAccount(encryptionPassword: string, settings: NetworkSettings)
                                   256 / 8,
                                   'sha512');
     const aesCtr = new aesjs.ModeOfOperation.ctr(key);
-    const pkBytes = aesjs.utils.utf8.toBytes(account.privateKey.substr(2));
+    const pk = account.privateKey.substr(2);
+    const hashsum = checksum(pk);
+    const pkBytes = aesjs.utils.utf8.toBytes(pk);
     const pkEncrypted = aesCtr.encrypt(pkBytes);
     // TODO: append hashsum for password validation
     const pkHex = aesjs.utils.hex.fromBytes(pkEncrypted);
 
     settings.address = account.address;
-    settings.privateKey = pkHex;
+    settings.privateKey = pkHex + hashsum;
 
     return account.privateKey;
 }
@@ -98,11 +111,18 @@ function getCurrentAccountPrivateKey(encryptionPassword: string, settings: Netwo
                                   256 / 8,
                                   'sha512');
     const aesCtr = new aesjs.ModeOfOperation.ctr(key);
-    const pkHex = settings.privateKey;
+    const pkHex = settings.privateKey.substr(0, settings.privateKey.length - SHA256_HEX_LENGTH);
+    const hashsum = settings.privateKey.substr(settings.privateKey.length - SHA256_HEX_LENGTH);
     const pkEncrypted = aesjs.utils.hex.toBytes(pkHex);
     const pkBytes = aesCtr.decrypt(pkEncrypted);
+    const pk = aesjs.utils.utf8.fromBytes(pkBytes);
 
-    return '0x' + aesjs.utils.utf8.fromBytes(pkBytes);
+    // validate password using checksum
+    if (hashsum !== checksum(pk)) {
+        throw Error('Invalid password');
+    }
+
+    return '0x' + pk;
 }
 
 
@@ -175,8 +195,13 @@ function showEnterPasswordDialog(settings: NetworkSettings): Promise<string> {
     return new Promise((resolve, reject) => {
         vscode.window.showInputBox(options).then(password => {
             if (password) {
-                const privateKey = getCurrentAccountPrivateKey(password, settings);
-                resolve(privateKey);
+                try {
+                    const privateKey = getCurrentAccountPrivateKey(password, settings);
+                    resolve(privateKey);
+                } catch (error) {
+                    vscode.window.showErrorMessage(error.message);
+                    reject(error);
+                }
             } else {
                 reject(Error('Canceled'));
             }
