@@ -31,27 +31,29 @@ export function printlnOutput(line: string) {
     channel.show();
 }
 
-export function getSettings(): NetworkSettings {
+export function getSettings(): Promise<NetworkSettings> {
     let settings = vscode.workspace.getConfiguration('solidity').get<NetworkSettings>('network');
-    if ( ! (settings.address && settings.privateKey)) {
-        // TODO: replace hardcoded 'test' values with value from dialog prompt
-        createNewAccount('test');
-    }
 
-    web3.eth.accounts.wallet.clear();
-    web3.eth.accounts.wallet.add(getCurrentAccountPrivateKey('test'));
-    return settings;
+    const getPassword =  (!(settings.address && settings.privateKey))
+                                    ? showCreateNewAccountDialog
+                                    : showEnterPasswordDialog;
+
+    return getPassword(settings).then(privateKey => {
+        web3.eth.accounts.wallet.clear();
+        web3.eth.accounts.wallet.add(privateKey);
+        vscode.workspace.getConfiguration('solidity').update('network', settings);
+        return settings;
+    });
 }
 
 export function addContractAddress(name: string, address: string) {
-    let settings = getSettings();
-
-    if (! settings.contracts) {
-        settings.contracts = {};
-    }
-    settings.contracts[name] = address;
-
-    vscode.workspace.getConfiguration('solidity').update('network', settings);
+    getSettings().then(settings => {
+        if (! settings.contracts) {
+            settings.contracts = {};
+        }
+        settings.contracts[name] = address;
+        vscode.workspace.getConfiguration('solidity').update('network', settings);
+    });
 }
 
 
@@ -60,11 +62,10 @@ export function addContractAddress(name: string, address: string) {
  * password private key to settings and return the last one unencrypted
  * for further use
  * @param encryptionPassword password for private key encryption
+ * @param settings to which info about account will be saved
  * @returns private key of created account
  */
-function createNewAccount(encryptionPassword: string): string {
-    const settings = vscode.workspace.getConfiguration('solidity')
-                                     .get<NetworkSettings>('network');
+function createNewAccount(encryptionPassword: string, settings: NetworkSettings): string {
     const account = (web3.eth.accounts as any).create();
 
     const key = crypto.pbkdf2Sync(aesjs.utils.utf8.toBytes(encryptionPassword),
@@ -80,23 +81,17 @@ function createNewAccount(encryptionPassword: string): string {
 
     settings.address = account.address;
     settings.privateKey = pkHex;
-    vscode.workspace.getConfiguration('solidity')
-                    .update('network', settings);
 
-    const settings2 = vscode.workspace.getConfiguration('solidity')
-                        .get<NetworkSettings>('network');
     return account.privateKey;
 }
 
 /**
  * Retrieves current Ethereum account private key, decrypts it and return raw
  * @param encryptionPassword password used for private key encryption
+ * @param settings settings for retrivieng privateKey in encrypted form
  * @returns current Ethereum account private key in plain text
 */
-export function getCurrentAccountPrivateKey(encryptionPassword: string): string {
-    const settings = vscode.workspace.getConfiguration('solidity')
-                                     .get<NetworkSettings>('network');
-
+function getCurrentAccountPrivateKey(encryptionPassword: string, settings: NetworkSettings): string {
     const key = crypto.pbkdf2Sync(aesjs.utils.utf8.toBytes(encryptionPassword),
                                   '',
                                   1,
@@ -134,6 +129,43 @@ function getMatchingBracket(text: String, startBracketPosition: number): number 
     }
 
     return null;
+}
+
+
+/**
+ * Show dialog for entering new password for encryption and if used entered,
+ * call createNewAccount() with this password
+ * @param settings settings for saving info about new account
+ * @return promise to the unencrypted private key
+*/
+function showCreateNewAccountDialog(settings: NetworkSettings): Promise<string> {
+    let options: vscode.InputBoxOptions = {
+        password: true,
+        placeHolder: 'Enter new password for account',
+        prompt: 'New password: ',
+    };
+
+    return vscode.window.showInputBox(options)
+                .then(password => createNewAccount(password, settings));
+}
+
+
+/**
+ * Show dialog for entering password for decryption and if user entered,
+ * call getCurrentAccountPrivateKey() with this password
+ * @param settings settings for retrieving info about account for decrypting
+ * @return promise to the unencrypted private key
+*/
+function showEnterPasswordDialog(settings: NetworkSettings): Promise<string> {
+    let options: vscode.InputBoxOptions = {
+        password: true,
+        placeHolder: 'Enter password for account: ',
+        prompt: 'Password: ',
+    };
+
+    // TODO: check for incorrect password case (hashsum)
+    return vscode.window.showInputBox(options)
+                .then(password => getCurrentAccountPrivateKey(password, settings), null);
 }
 
 /**
