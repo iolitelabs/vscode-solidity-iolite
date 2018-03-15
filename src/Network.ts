@@ -66,18 +66,20 @@ export function deployContract() {
             return;
         }
 
-        outfit.deploy(getSettings().address, contract, preparedParams).then(emiter => {
-            emiter.on('transactionHash', transactionHash => {
-                printlnOutput('TX HASH: ' + transactionHash);
-                printlnOutput('Wait until will be mined ...');
-            }).on('receipt', receipt => {
-                printlnOutput('SUCCESS: Contract address: ' + receipt.contractAddress);
-                addContractAddress(contractName, receipt.contractAddress);
-            }).on('error', error => {
+        getSettings().then(settings => {
+            outfit.deploy(settings.address, contract, preparedParams).then(emiter => {
+                emiter.on('transactionHash', transactionHash => {
+                    printlnOutput('TX HASH: ' + transactionHash);
+                    printlnOutput('Wait until will be mined ...');
+                }).on('receipt', receipt => {
+                    printlnOutput('SUCCESS: Contract address: ' + receipt.contractAddress);
+                    addContractAddress(contractName, receipt.contractAddress);
+                }).on('error', error => {
+                    printlnOutput('FAIL: ' + error.message);
+                });
+            }).catch(error => {
                 printlnOutput('FAIL: ' + error.message);
             });
-        }).catch(error => {
-            printlnOutput('FAIL: ' + error.message);
         });
     };
 
@@ -90,15 +92,14 @@ export function deployContract() {
 }
 
 export function getBalance() {
-    console.log('Hello');
-    const settings = getSettings();
-
-    web3.eth.getBalance(settings.address)
+    getSettings().then(settings => {
+        web3.eth.getBalance(settings.address)
         .then(balance => {
             printlnOutput('Balance of ' + settings.address + ' is ' + web3.utils.fromWei(balance, 'ether') + ' ETH');
         }).catch(error => {
             printlnOutput('FAIL: ' + error.message);
         });
+    });
 }
 
 export function callMethod() {
@@ -124,53 +125,53 @@ export function callMethod() {
         return;
     }
 
-    const settings = getSettings();
-
-    if ( !(settings.contracts && settings.contracts[contractName])) {
-        vscode.window.showWarningMessage('You need to deploy contract first');
-        return;
-    }
-
-    const options: InputBoxOptions = {
-        placeHolder: getMethodPlaceHolder(methodAbi),
-        prompt: 'Enter parameters ',
-    };
-
-    const callMethodWithParams = function (params) {
-        const preparedParams = parseParams(methodAbi, params);
-
-        if ( ! preparedParams) {
+    getSettings().then(settings => {
+        if ( !(settings.contracts && settings.contracts[contractName])) {
+            vscode.window.showWarningMessage('You need to deploy contract first');
             return;
         }
 
-        outfit.call(settings.address,
-            { abi: contractAbi, address: settings.contracts[contractName] },
-            { name: methodAbi.name, params: preparedParams }) // .map(el => web3.utils.stringToHex(el))
-            .then(emiter => {
-                emiter.on('call', result => {
-                    printlnOutput('CALL RESULT: ' + result);
-                    if (methodAbi.outputs.length === 1 && methodAbi.outputs[0].type.includes('bytes')) {
-                        printlnOutput('RESULT AS STRING: ' + web3.utils.hexToString(result));
-                    }
-                }).on('transactionHash', transactionHash => {
-                    printlnOutput('TX HASH: ' + transactionHash);
-                    printlnOutput('Wait until will be mined ...');
-                }).on('receipt', receipt => {
-                    printlnOutput('SUCCESS: Gas used: ' + receipt.gasUsed);
-                }).on('error', error => {
+        const options: InputBoxOptions = {
+            placeHolder: getMethodPlaceHolder(methodAbi),
+            prompt: 'Enter parameters ',
+        };
+
+        const callMethodWithParams = function (params) {
+            const preparedParams = parseParams(methodAbi, params);
+
+            if ( ! preparedParams) {
+                return;
+            }
+
+            outfit.call(settings.address,
+                { abi: contractAbi, address: settings.contracts[contractName] },
+                { name: methodAbi.name, params: preparedParams }) // .map(el => web3.utils.stringToHex(el))
+                .then(emiter => {
+                    emiter.on('call', result => {
+                        printlnOutput('CALL RESULT: ' + result);
+                        if (methodAbi.outputs.length === 1 && methodAbi.outputs[0].type.includes('bytes')) {
+                            printlnOutput('RESULT AS STRING: ' + web3.utils.hexToString(result));
+                        }
+                    }).on('transactionHash', transactionHash => {
+                        printlnOutput('TX HASH: ' + transactionHash);
+                        printlnOutput('Wait until will be mined ...');
+                    }).on('receipt', receipt => {
+                        printlnOutput('SUCCESS: Gas used: ' + receipt.gasUsed);
+                    }).on('error', error => {
+                        printlnOutput('FAIL: ' + error.message);
+                    });
+                }).catch(error => {
                     printlnOutput('FAIL: ' + error.message);
                 });
-            }).catch(error => {
-                printlnOutput('FAIL: ' + error.message);
-            });
-    };
+        };
 
-    if (methodAbi.inputs.length) {
-        vscode.window.showInputBox(options)
-            .then(value => value && callMethodWithParams(value));
-    } else {
-        callMethodWithParams(null);
-    }
+        if (methodAbi.inputs.length) {
+            vscode.window.showInputBox(options)
+                .then(value => value && callMethodWithParams(value));
+        } else {
+            callMethodWithParams(null);
+        }
+    });
 }
 
 export interface ContractObject {
