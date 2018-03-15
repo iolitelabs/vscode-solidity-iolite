@@ -145,8 +145,16 @@ function showCreateNewAccountDialog(settings: NetworkSettings): Promise<string> 
         prompt: 'New password: ',
     };
 
-    return vscode.window.showInputBox(options)
-                .then(password => createNewAccount(password, settings));
+    return new Promise((resolve, reject) => {
+        vscode.window.showInputBox(options).then(password => {
+            if (password) {
+                const privateKey = createNewAccount(password, settings);
+                resolve(privateKey);
+            } else {
+                reject(Error('Canceled'));
+            }
+        });
+    });
 }
 
 
@@ -164,8 +172,16 @@ function showEnterPasswordDialog(settings: NetworkSettings): Promise<string> {
     };
 
     // TODO: check for incorrect password case (hashsum)
-    return vscode.window.showInputBox(options)
-                .then(password => getCurrentAccountPrivateKey(password, settings), null);
+    return new Promise((resolve, reject) => {
+        vscode.window.showInputBox(options).then(password => {
+            if (password) {
+                const privateKey = getCurrentAccountPrivateKey(password, settings);
+                resolve(privateKey);
+            } else {
+                reject(Error('Canceled'));
+            }
+        });
+    });
 }
 
 /**
