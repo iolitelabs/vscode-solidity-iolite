@@ -10,6 +10,9 @@ let outputChannel: OutputChannel = null;
 const _Web3 = Web3 as any;
 export const web3 = new _Web3(new _Web3.providers.HttpProvider('https://ropsten.infura.io/'));
 
+let cachedPrivateKey          = undefined;
+let cachedPrivateKeyEncrypted = undefined;
+
 function getOutputChannel(): OutputChannel {
     if (!outputChannel) {
         outputChannel = vscode.window.createOutputChannel('Ethereum');
@@ -33,13 +36,20 @@ export function printlnOutput(line: string) {
 export function getSettings(): Promise<NetworkSettings> {
     let settings = vscode.workspace.getConfiguration('solidity').get<NetworkSettings>('network');
 
-    const getPassword =  (!(settings.address && settings.privateKey))
-                                    ? account.showCreateNewAccountDialog
-                                    : account.showEnterPasswordDialog;
+    let getPassword;
+    if (!(settings.address && settings.privateKey)) {
+        getPassword = account.showCreateNewAccountDialog;
+    } else if (settings.privateKey === cachedPrivateKeyEncrypted) {
+        getPassword = _ => Promise.resolve(cachedPrivateKey);
+    } else {
+        getPassword = account.showEnterPasswordDialog;
+    }
 
     return getPassword(settings).then(privateKey => {
         web3.eth.accounts.wallet.clear();
         web3.eth.accounts.wallet.add(privateKey);
+        cachedPrivateKeyEncrypted = settings.privateKey;
+        cachedPrivateKey = privateKey;
         vscode.workspace.getConfiguration('solidity').update('network', settings);
         return settings;
     });
