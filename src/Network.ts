@@ -7,6 +7,7 @@ import * as projService from './projectService';
 import { web3, getSettings, cleanOutput, printlnOutput, addContractAddress, getCurrentContractName } from './network/common';
 import { error } from 'util';
 import { InputBoxOptions } from 'vscode';
+import { DeployDocumentContentProvider } from './documents/deployDocument';
 
 const outfit = ContractsOutfit(web3);
 
@@ -66,15 +67,27 @@ export function deployContract() {
             return;
         }
 
+
         getSettings().then(settings => {
+            let uri = vscode.Uri.parse('vscode-solidity://' + contractName);
+            let provider = new DeployDocumentContentProvider(uri);
+            provider.contractName = contractName;
+            let registration = vscode.workspace.registerTextDocumentContentProvider('vscode-solidity', provider);
+            vscode.commands.executeCommand('vscode.previewHtml', uri, vscode.ViewColumn.Two, 'Deploying ' + contractName).then((success) => {
+            }, (reason) => {
+                vscode.window.showErrorMessage(reason);
+            });
             outfit.deploy(settings.address, contract, preparedParams).then(emiter => {
                 emiter.on('transactionHash', transactionHash => {
+                    provider.txHash = transactionHash;
                     printlnOutput('TX HASH: ' + transactionHash);
                     printlnOutput('Wait until will be mined ...');
                 }).on('receipt', receipt => {
+                    provider.contractAddress = receipt.contractAddress;
                     printlnOutput('SUCCESS: Contract address: ' + receipt.contractAddress);
                     addContractAddress(contractName, receipt.contractAddress);
                 }).on('error', error => {
+                    provider.error = error.message;
                     printlnOutput('FAIL: ' + error.message);
                 });
             }).catch(error => {
