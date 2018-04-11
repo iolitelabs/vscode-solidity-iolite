@@ -82,7 +82,7 @@ function ContractsOutfit(web3) {
     const methodObject = contractObject.methods[method.name].apply(this, method.params)  // also we can use the spread operator
     const stateMutability = contract.abi.find(element => element.name === method.name).stateMutability // do not believe methodObject._method.stateMutability
 
-    if (stateMutability === "view") {
+    if (stateMutability === "view" || stateMutability === "pure") {
       return new Promise((resolve, reject) => {
         const emiter = new EventEmitter()
         resolve(emiter)
