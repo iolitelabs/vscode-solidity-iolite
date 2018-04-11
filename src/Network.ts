@@ -14,7 +14,7 @@ const outfit = ContractsOutfit(web3);
 function getContractJson(contractName: string): ContractObject | null {
     const editor = vscode.window.activeTextEditor;
 
-    const project = projService.initialiseProject(vscode.workspace.rootPath);
+    const project = projService.initialiseProject(vscode.workspace.rootPath, '', 'src');
     const binPath = path.join(vscode.workspace.rootPath, project.projectPackage.build_dir);
     const contractJsonPath = path.join(binPath, 'contracts', contractName + '.json');
 
@@ -209,7 +209,7 @@ function prepareSingle(type, value) {
 
 function prepareValues(types, values): Array<any> {
     const prepared = [];
-    for (let i in types) {
+    for (let i of types) {
         prepared.push(prepareSingle(types[i], values[i]));
     }
     return prepared;
