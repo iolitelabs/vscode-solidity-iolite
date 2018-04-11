@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as ContractsOutfit from './network/contractsOutfit';
 import * as projService from './projectService';
 import { web3, getSettings, cleanOutput, printlnOutput, addContractAddress, getCurrentContractName } from './network/common';
-import { error } from 'util';
+import { error, inspect } from 'util';
 import { InputBoxOptions } from 'vscode';
 import { DeployDocumentContentProvider } from './documents/deployDocument';
 
@@ -161,7 +161,7 @@ export function callMethod() {
                 { name: methodAbi.name, params: preparedParams }) // .map(el => web3.utils.stringToHex(el))
                 .then(emiter => {
                     emiter.on('call', result => {
-                        printlnOutput('CALL RESULT: ' + result);
+                        printlnOutput('CALL RESULT: ' + inspect(result, false, null));
                         if (methodAbi.outputs.length === 1 && methodAbi.outputs[0].type.includes('bytes')) {
                             printlnOutput('RESULT AS STRING: ' + web3.utils.hexToString(result));
                         }
