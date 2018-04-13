@@ -26,7 +26,8 @@ function getContractJson(contractName: string): ContractObject | null {
 }
 
 export function deployContract() {
-    let editor = vscode.window.activeTextEditor;
+    const editor = vscode.window.activeTextEditor;
+    const fileName = path.basename(editor.document.fileName);
 
     if (!editor) {
         return; // We need something open
@@ -51,7 +52,7 @@ export function deployContract() {
     }
 
     const contractAbi = JSON.parse(contract.abi);
-    const constructorAbi = contractAbi.find(element => {
+    const constteructorAbi = contractAbi.find(element => {
         return element.type === 'constructor';
     });
 
@@ -85,7 +86,7 @@ export function deployContract() {
                 }).on('receipt', receipt => {
                     provider.contractAddress = receipt.contractAddress;
                     printlnOutput('SUCCESS: Contract address: ' + receipt.contractAddress);
-                    addContractAddress(contractName, receipt.contractAddress);
+                    addContractAddress(fileName + ':' + contractName, receipt.contractAddress);
                 }).on('error', error => {
                     provider.error = error.message;
                     printlnOutput('FAIL: ' + error.message);
@@ -118,6 +119,7 @@ export function getBalance() {
 export function callMethod() {
     const editor = vscode.window.activeTextEditor;
 
+    const fileName = path.basename(editor.document.fileName);
     const contractName = getCurrentContractName();
     const contract = getContractJson(contractName);
     if ( ! contract) {
@@ -139,7 +141,7 @@ export function callMethod() {
     }
 
     getSettings().then(settings => {
-        if ( !(settings.contracts && settings.contracts[contractName])) {
+        if ( !(settings.contracts && settings.contracts[fileName + ':' + contractName])) {
             vscode.window.showWarningMessage('You need to deploy contract first');
             return;
         }
@@ -157,7 +159,7 @@ export function callMethod() {
             }
 
             outfit.call(settings.address,
-                { abi: contractAbi, address: settings.contracts[contractName] },
+                { abi: contractAbi, address: settings.contracts[fileName + ':' + contractName] },
                 { name: methodAbi.name, params: preparedParams }) // .map(el => web3.utils.stringToHex(el))
                 .then(emiter => {
                     emiter.on('call', result => {
