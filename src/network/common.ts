@@ -55,6 +55,11 @@ export function getSettings(): Promise<NetworkSettings> {
     });
 }
 
+/**
+ * Add new contract address to settings
+ * @param name contract name with file name, e.g. 'BaseToken.sol:BaseToken'
+ * @param address contract address
+ */
 export function addContractAddress(name: string, address: string) {
     getSettings().then(settings => {
         if (! settings.contracts) {
