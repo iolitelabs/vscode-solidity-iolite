@@ -132,5 +132,12 @@ You may request current balance of your wallet
 
 ### Deploying contract
 
-You may deploy contract to Ethereum blockchain, using your wallet. Your contract must be already compiled and you must have some ether to do that).
+You may deploy contract to Ethereum blockchain, using your wallet. Your contract must be already compiled and you must have some ether to do that.
 
+![Screenshot](screenshots/deploy.gif)
+
+### Calling a method
+
+You may call a method of already deployed contracts.
+
+![Screenshot](screenshots/callmethod.gif)
