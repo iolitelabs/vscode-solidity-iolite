@@ -54,7 +54,7 @@ export class CompletionService {
                let currentParamSnippet = '${' + counter + ':' + parameterElement.id + '}';
                 if (paramsSnippet === '') {
                     paramsSnippet = currentParamSnippet;
-                }else {
+                } else {
                     paramsSnippet = paramsSnippet + ', ' + currentParamSnippet;
                 }
             });
@@ -75,7 +75,7 @@ export class CompletionService {
                 }
                 if (paramsInfo === '') {
                     paramsInfo = currentParamInfo;
-                }else {
+                } else {
                     paramsInfo = paramsInfo + ', ' + currentParamInfo;
                 }
             });
@@ -144,14 +144,17 @@ export class CompletionService {
         return completionItems;
     }
 
-    public getAllCompletionItems(documentText: string, documentPath: string): CompletionItem[] {
+    public getAllCompletionItems(documentText: string,
+                                documentPath: string,
+                                packageDefaultDependenciesDirectory: string,
+                                packageDefaultDependenciesContractsDirectory: string): CompletionItem[] {
 
         if (this.rootPath !== 'undefined' && this.rootPath !== null) {
             const contracts = new ContractCollection();
             contracts.addContractAndResolveImports(
                 documentPath,
                 documentText,
-                projectService.initialiseProject(this.rootPath));
+                projectService.initialiseProject(this.rootPath, packageDefaultDependenciesDirectory, packageDefaultDependenciesContractsDirectory));
             let completionItems = [];
             contracts.contracts.forEach(contract => {
                 completionItems = completionItems.concat(this.getDocumentCompletionItems(contract.code));
@@ -352,7 +355,7 @@ function getBlockCompletionItems(): CompletionItem[] {
         {
             detail: '(uint): current block gaslimit',
             kind: CompletionItemKind.Property,
-            label: 'gasLimit',
+            label: 'gaslimit',
         },
         {
             detail: '(uint): current block number',

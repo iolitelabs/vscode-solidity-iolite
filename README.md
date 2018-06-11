@@ -96,28 +96,13 @@ configuration.
 
 ### Solium
 
-Solium is the other linter supported (default one) https://github.com/duaraghav8/Solium, you can configure it using the following user settings:
+Solium is the default linter of supported by the extesion https://github.com/duaraghav8/Solium, you can configure it using the following user settings:
 
 ```json
 "solidity.linter": "solium",
 "solidity.soliumRules": {
-    "array-declarations": true,
-    "blank-lines": false,
-    "camelcase": true,
-    "deprecated-suicide": true,
-    "double-quotes": true,
-    "imports-on-top": true,
-    "indentation": false,
-    "lbrace": true,
-    "mixedcase": true,
-    "no-empty-blocks": true,
-    "no-unused-vars": true,
-    "no-with": true,
-    "operator-whitespace": true,
-    "pragma-on-top": true,
-    "uppercase": true,
-    "variable-declarations": true,
-    "whitespace": true
+    "quotes": ["error", "double"],
+    "indentation": ["error", 4]
 },
 ```
 
@@ -141,6 +126,10 @@ Ilya Drabenia for creating the Solhint linter and the integration into the exten
 Nexus team for the original creation of the dappfile to structure contracts in projects https://github.com/nexusdev/dapple.
 
 Beau Gunderson for contributing the initial integration of solium  https://github.com/juanfranblanco/vscode-solidity/issues/24, the initial server and error mappings.
+
+Bram Hoven for starting the multiple package dependency support for different environments (node_modules, lib)
+
+Piotr Szlachciak for refactoring the syntaxes
 
 Nick Addison, Elazar Gershuni, Joe Whittles for their contributions.
 
