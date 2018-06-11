@@ -4,9 +4,10 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import {compileAllContracts} from './compileAll';
 import {compileActiveContract, initDiagnosticCollection} from './compileActive';
-import {codeGenerate} from './codegen';
+import {codeGenerate, codeGenerateNethereumCQSCsharp, codeGenerateNethereumCQSFSharp, codeGenerateNethereumCQSVbNet} from './codegen';
 import {LanguageClient, LanguageClientOptions, ServerOptions, TransportKind, RevealOutputChannelOn} from 'vscode-languageclient';
 import { deployContract, getBalance, callMethod } from './Network';
+import {lintAndfixCurrentDocument} from './linter/soliumClientFixer';
 
 let diagnosticCollection: vscode.DiagnosticCollection;
 
@@ -41,6 +42,23 @@ export function activate(context: vscode.ExtensionContext) {
         callMethod();
     }));
 
+    context.subscriptions.push(vscode.commands.registerCommand('solidity.codegenCSharpProject', (args: any[]) => {
+        codeGenerateNethereumCQSCsharp(args, diagnosticCollection);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('solidity.codegenVbNetProject', (args: any[]) => {
+        codeGenerateNethereumCQSVbNet(args, diagnosticCollection);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('solidity.codegenFSharpProject', (args: any[]) => {
+        codeGenerateNethereumCQSFSharp(args, diagnosticCollection);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('solidity.fixDocument', () => {
+        lintAndfixCurrentDocument();
+    }));
+
+
     const serverModule = path.join(__dirname, 'server.js');
 
     const serverOptions: ServerOptions = {
@@ -58,14 +76,17 @@ export function activate(context: vscode.ExtensionContext) {
     };
 
     const clientOptions: LanguageClientOptions = {
-        documentSelector: ['solidity'],
+        documentSelector: [
+            { language: 'solidity', scheme: 'file' },
+            { language: 'solidity', scheme: 'untitled' },
+        ],
+        revealOutputChannelOn: RevealOutputChannelOn.Never,
         synchronize: {
                     // Synchronize the setting section 'solidity' to the server
                     configurationSection: 'solidity',
                     // Notify the server about file changes to '.sol.js files contain in the workspace (TODO node, linter)
                     // fileEvents: vscode.workspace.createFileSystemWatcher('**/.sol.js'),
                 },
-        revealOutputChannelOn: RevealOutputChannelOn.Never
     };
 
     const clientDisposible = new LanguageClient(

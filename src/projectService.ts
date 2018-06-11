@@ -6,8 +6,14 @@ import {Package} from './model/package';
 import {Project} from  './model/project';
 
 // TODO: These are temporary constants until standard agreed
+// A project standard is needed so each project can define where it store its project dependencies
+// and if are relative or at project source
+// also versioning (as it was defined years ago)
+
 const packageConfigFileName = 'dappFile';
-const packageDependenciesDirectory = 'lib';
+// These are set using user configuration settings
+let packageDependenciesDirectory = 'lib';
+let packageDependenciesContractsDirectory = 'src';
 
 function createPackage(rootPath: string) {
     let projectPackageFile = path.join(rootPath, packageConfigFileName);
@@ -28,7 +34,7 @@ function createPackage(rootPath: string) {
             }
             if (projectPackage.name !== undefined) {
                 projectPackage.name = packageConfig.name;
-            }else {
+            } else {
                 projectPackage.name = path.basename(rootPath);
             }
 
@@ -45,7 +51,9 @@ function createPackage(rootPath: string) {
     return null;
 }
 
-export function initialiseProject(rootPath) {
+export function initialiseProject(rootPath: string, packageDefaultDependenciesDirectory: string, packageDefaultDependenciesContractsDirectory: string) {
+    packageDependenciesDirectory = packageDefaultDependenciesDirectory;
+    packageDependenciesContractsDirectory = packageDefaultDependenciesContractsDirectory;
     let projectPackage = createProjectPackage(rootPath);
     let dependencies = loadDependencies(rootPath, projectPackage);
     let packagesDirAbsolutePath = path.join(rootPath, packageDependenciesDirectory);
