@@ -116,34 +116,21 @@ Solium is the default linter of supported by the extesion https://github.com/dua
 
 soliumrc.json support will be included in the near future, for specific project linting requirements.
 
-## Contributing / Issues / Requests
+## Wallet Actions
 
-For ideas, issues, additions, modifications please raise an issue or a pull request at https://github.com/juanfranblanco/vscode-solidity/
-and send a message on gitter at https://gitter.im/vscode-solidity/Lobby or https://gitter.im/Nethereum/Nethereum to get an instant notification.
+Plugin also supports actions that require embedded wallet. Wallet private key is encrypted and you must supply password for encryption/decryption.
 
-# Credits
+Every time when you want use action, that require wallet, you will be prompted for password. If it's your first such action you will be prompted to enter new password
 
-Many thanks to:
+![Screenshot](screenshots/setpasswordgetbalance.gif)
 
-Christian Reitwiessner and the Ethereum team for Solidity https://github.com/ethereum/solidity
+### Get Balance
 
-Raghav Dua and everyone that contributed to Solium, the solidity linter, and the solidity parser.
+You may request current balance of your wallet
 
-Ilya Drabenia for creating the Solhint linter and the integration into the extension.
+![Screenshot](screenshots/setpasswordgetbalance.gif)
 
-Nexus team for the original creation of the dappfile to structure contracts in projects https://github.com/nexusdev/dapple.
+### Deploying contract
 
-Beau Gunderson for contributing the initial integration of solium  https://github.com/juanfranblanco/vscode-solidity/issues/24, the initial server and error mappings.
+You may deploy contract to Ethereum blockchain, using your wallet. Your contract must be already compiled and you must have some ether to do that).
 
-Bram Hoven for starting the multiple package dependency support for different environments (node_modules, lib)
-
-Piotr Szlachciak for refactoring the syntaxes
-
-Nick Addison, Elazar Gershuni, Joe Whittles for their contributions.
-
-Sebastian Bürgel for keeping reminding me of the offline installation suppport
-
-David Krmpotic and Ralph Pichler for the original Sublime extension
-https://github.com/davidhq/SublimeEthereum
-
-Everyone for their support and feedback!
