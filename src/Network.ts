@@ -16,13 +16,18 @@ function getContractJson(contractName: string): ContractObject | null {
 
     const project = projService.initialiseProject(vscode.workspace.rootPath);
     const binPath = path.join(vscode.workspace.rootPath, project.projectPackage.build_dir);
-    const contractJsonPath = path.join(binPath, 'contracts', contractName + '.json');
+    const contractJsonPaths = [
+        path.join(binPath, contractName + '.json'),
+        path.join(binPath, 'contracts', contractName + '.json')];
 
-    if ( ! fs.existsSync(contractJsonPath)) {
-        return null;
+    for (let path of contractJsonPaths) {
+        if ( ! fs.existsSync(path)) {
+            continue;
+        }
+        return JSON.parse(fs.readFileSync(path, 'utf8'));
     }
-
-    return JSON.parse(fs.readFileSync(contractJsonPath, 'utf8'));
+    
+    return null;
 }
 
 export function deployContract() {
