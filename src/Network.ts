@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 // import * as ContractsOutfit from './network/contractsOutfit';
-import ContractsOutfit = require('./network/contractsOutfit')
+import ContractsOutfit = require('./network/contractsOutfit');
 import * as projService from './projectService';
 import { web3, getSettings, cleanOutput, printlnOutput, addContractAddress, getCurrentContractName } from './network/common';
 import { error, inspect } from 'util';
