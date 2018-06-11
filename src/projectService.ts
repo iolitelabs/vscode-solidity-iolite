@@ -21,7 +21,7 @@ function createPackage(rootPath: string) {
         // TODO: automapper
         let packageConfig = readyaml.sync(projectPackageFile);
         // TODO: throw expection / warn user of invalid package file
-        let projectPackage = new Package();
+        let projectPackage = new Package("./");
         projectPackage.absoluletPath = rootPath;
         if (packageConfig) {
             if (packageConfig.layout !== undefined) {
@@ -104,7 +104,7 @@ function getDirectories(dirPath: string): string[] {
 }
 
 function createDefaultPackage(packagePath: string): Package {
-    let defaultPackage = new Package();
+    let defaultPackage = new Package('');
     defaultPackage.absoluletPath = packagePath;
     defaultPackage.name = path.basename(packagePath);
     return defaultPackage;
