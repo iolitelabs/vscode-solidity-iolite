@@ -128,7 +128,7 @@ First time in Visual Studio session when you want use action, that require walle
 
 You may request current balance of your wallet
 
-![Screenshot](screenshots/setpasswordgetbalance.gif)
+![Screenshot](screenshots/getbalance.gif)
 
 ### Deploying contract
 
