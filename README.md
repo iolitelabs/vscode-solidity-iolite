@@ -120,7 +120,7 @@ soliumrc.json support will be included in the near future, for specific project 
 
 Plugin also supports actions that require embedded wallet. Wallet private key is encrypted and you must supply password for encryption/decryption.
 
-Every time when you want use action, that require wallet, you will be prompted for password. If it's your first such action you will be prompted to enter new password
+First time in Visual Studio session when you want use action, that require wallet, you will be prompted for password. If it's your first such action you will be prompted to enter new password
 
 ![Screenshot](screenshots/setpasswordgetbalance.gif)
 
