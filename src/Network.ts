@@ -9,6 +9,7 @@ import { web3, getSettings, cleanOutput, printlnOutput, addContractAddress, getC
 import { error, inspect } from 'util';
 import { InputBoxOptions } from 'vscode';
 import { DeployDocumentContentProvider } from './documents/deployDocument';
+import { CallMethodDocumentContentProvider } from './documents/callMethod';
 
 const outfit = ContractsOutfit(web3);
 
@@ -147,6 +148,7 @@ export function callMethod() {
     }
 
     getSettings().then(settings => {
+
         if ( !(settings.contracts && settings.contracts[fileName + ':' + contractName])) {
             vscode.window.showWarningMessage('You need to deploy contract first');
             return;
@@ -164,6 +166,16 @@ export function callMethod() {
                 return;
             }
 
+            let uri = vscode.Uri.parse('vscode-solidity://' + contractName);
+            let provider = new CallMethodDocumentContentProvider(uri);
+            provider.contractName = contractName;
+            provider.methodName = word;
+            let registration = vscode.workspace.registerTextDocumentContentProvider('vscode-solidity', provider);
+            vscode.commands.executeCommand('vscode.previewHtml', uri, vscode.ViewColumn.Two, 'Deploying ' + contractName).then((success) => {
+            }, (reason) => {
+                vscode.window.showErrorMessage(reason);
+            });
+
             outfit.call(settings.address,
                 { abi: contractAbi, address: settings.contracts[fileName + ':' + contractName] },
                 { name: methodAbi.name, params: preparedParams }) // .map(el => web3.utils.stringToHex(el))
@@ -174,11 +186,14 @@ export function callMethod() {
                             printlnOutput('RESULT AS STRING: ' + web3.utils.hexToString(result));
                         }
                     }).on('transactionHash', transactionHash => {
+                        provider.txHash = transactionHash;
                         printlnOutput('TX HASH: ' + transactionHash);
                         printlnOutput('Wait until will be mined ...');
                     }).on('receipt', receipt => {
                         printlnOutput('SUCCESS: Gas used: ' + receipt.gasUsed);
+                        // provider.gasUsed = receipt.gasUsed.toString();
                     }).on('error', error => {
+                        provider.error = error.message;
                         printlnOutput('FAIL: ' + error.message);
                     });
                 }).catch(error => {
