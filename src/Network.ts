@@ -191,7 +191,7 @@ export function callMethod() {
                         printlnOutput('Wait until will be mined ...');
                     }).on('receipt', receipt => {
                         printlnOutput('SUCCESS: Gas used: ' + receipt.gasUsed);
-                        // provider.gasUsed = receipt.gasUsed.toString();
+                        provider.gasUsed = receipt.gasUsed.toString();
                     }).on('error', error => {
                         provider.error = error.message;
                         printlnOutput('FAIL: ' + error.message);
