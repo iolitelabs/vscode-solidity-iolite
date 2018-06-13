@@ -50,7 +50,6 @@
     "aes-js": "^3.1.0",
     "ajv": "^6.4.0",
     "fs-extra": "^4.0.3",
-    "nethereum-codegen": "^1.0.1",
     "read-yaml": "^1.1.0",
     "solc": "^0.4.23",
     "solhint": "^1.1.10",

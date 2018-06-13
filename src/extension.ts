@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import {compileAllContracts} from './compileAll';
 import {compileActiveContract, initDiagnosticCollection} from './compileActive';
-import {codeGenerate, codeGenerateNethereumCQSCsharp, codeGenerateNethereumCQSFSharp, codeGenerateNethereumCQSVbNet} from './codegen';
+import {codeGenerate} from './codegen';
 import {LanguageClient, LanguageClientOptions, ServerOptions, TransportKind, RevealOutputChannelOn} from 'vscode-languageclient';
 import { deployContract, getBalance, callMethod } from './Network';
 import {lintAndfixCurrentDocument} from './linter/soliumClientFixer';
@@ -40,18 +40,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(vscode.commands.registerCommand('solidity.network.callMethod', (args: any[]) => {
         callMethod();
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand('solidity.codegenCSharpProject', (args: any[]) => {
-        codeGenerateNethereumCQSCsharp(args, diagnosticCollection);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand('solidity.codegenVbNetProject', (args: any[]) => {
-        codeGenerateNethereumCQSVbNet(args, diagnosticCollection);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand('solidity.codegenFSharpProject', (args: any[]) => {
-        codeGenerateNethereumCQSFSharp(args, diagnosticCollection);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('solidity.fixDocument', () => {
