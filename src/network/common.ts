@@ -1,14 +1,15 @@
 'use strict';
 import * as vscode from 'vscode';
-import * as Web3 from 'web3';
 import { OutputChannel } from 'vscode';
 import { Position, Range } from 'vscode-languageserver/lib/main';
 import * as account from '../account';
 
 let outputChannel: OutputChannel = null;
 
-const _Web3 = Web3 as any;
-export const web3 = new _Web3(new _Web3.providers.HttpProvider('https://ropsten.infura.io/'));
+const IoliteProvider = require("iolite-provider");
+const provider = new IoliteProvider('https://sia.node.iolite.io');
+const Web3 = require("iolite-web3");
+export const web3 = new Web3(provider);
 
 let cachedPrivateKey          = undefined;
 let cachedPrivateKeyEncrypted = undefined;
