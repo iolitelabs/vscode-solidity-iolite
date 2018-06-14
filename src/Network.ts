@@ -181,7 +181,9 @@ export function callMethod() {
                 { name: methodAbi.name, params: preparedParams }) // .map(el => web3.utils.stringToHex(el))
                 .then(emiter => {
                     emiter.on('call', result => {
-                        printlnOutput('CALL RESULT: ' + inspect(result, false, null));
+			let callResult = inspect(result, false, null);
+                        printlnOutput('CALL RESULT: ' + callResult);
+			provider.callResult = callResult;
                         if (methodAbi.outputs.length === 1 && methodAbi.outputs[0].type.includes('bytes')) {
                             printlnOutput('RESULT AS STRING: ' + web3.utils.hexToString(result));
                         }
@@ -232,7 +234,7 @@ function prepareSingle(type, value) {
 
 function prepareValues(types, values): Array<any> {
     const prepared = [];
-    for (let i of types) {
+    for (let i in types) {
         prepared.push(prepareSingle(types[i], values[i]));
     }
     return prepared;
