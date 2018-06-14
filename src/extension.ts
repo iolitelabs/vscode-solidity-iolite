@@ -8,6 +8,7 @@ import {codeGenerate} from './codegen';
 import {LanguageClient, LanguageClientOptions, ServerOptions, TransportKind, RevealOutputChannelOn} from 'vscode-languageclient';
 import { deployContract, getBalance, callMethod } from './Network';
 import {lintAndfixCurrentDocument} from './linter/soliumClientFixer';
+import { isNumber } from 'util';
 
 let diagnosticCollection: vscode.DiagnosticCollection;
 
@@ -31,7 +32,24 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('solidity.network.deployContract', (args: any[]) => {
-        deployContract();
+        deployContract(undefined);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('solidity.network.deployContractWithMetadata', (args: any[]) => {
+        let options: vscode.InputBoxOptions = {
+            prompt: 'Enter metalimit: ',
+            validateInput: (value) => {
+                if (!isNaN(Number(value))) {
+                    return undefined;
+                } else {
+                    return value + " is not a number";
+                }
+            }
+        }
+        vscode.window.showInputBox(options).then((metalimit) => {
+            deployContract(parseInt(metalimit));
+        })
+        
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('solidity.network.getBalance', (args: any[]) => {

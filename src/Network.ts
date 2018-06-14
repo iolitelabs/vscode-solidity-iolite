@@ -32,7 +32,11 @@ function getContractJson(contractName: string): ContractObject | null {
     return null;
 }
 
-export function deployContract() {
+export function deployContract(metalimit: number) {
+    if (metalimit) {
+        printlnOutput("Deploying with metalimit: " + metalimit);
+    }
+
     const editor = vscode.window.activeTextEditor;
     const fileName = path.basename(editor.document.fileName);
 

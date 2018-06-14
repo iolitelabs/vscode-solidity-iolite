@@ -203,6 +203,10 @@
         "title": "Solidity: Deploy Current Solidity Contract"
       },
       {
+        "command": "solidity.network.deployContractWithMetadata",
+        "title": "Solidity: Deploy Current Solidity Contract Supplying Metalimit"
+      },
+      {
         "command": "solidity.network.getBalance",
         "title": "Solidity: Get Balance of Current Wallet"
       },
