@@ -50,6 +50,8 @@
     "aes-js": "^3.1.0",
     "ajv": "^5.0.0",
     "fs-extra": "^4.0.3",
+    "iolite-web3": "file:../iolite-web3",
+    "iolite-provider": "file:../iolite-provider",
     "read-yaml": "^1.1.0",
     "solc": "^0.4.23",
     "solhint": "^1.1.10",

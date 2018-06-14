@@ -67,8 +67,7 @@ export class CallMethodDocumentContentProvider implements vscode.TextDocumentCon
             if (this._txHash) {
                 document += '<div>';
                 document += 'TX HASH: ';
-                // TODO: get check for testnet/non-testnet etherscan
-                document += '<a href="https://ropsten.etherscan.io/tx/';
+                document += '<a href="https://sia.net.iolite.io/txs/';
                 document += this._txHash;
                 document += '">';
                 document += this._txHash;
@@ -79,7 +78,6 @@ export class CallMethodDocumentContentProvider implements vscode.TextDocumentCon
             if (this._gasUsed) {
                 document += '<div>';
                 document += 'SUCCESS! Gas used:  ' + this._gasUsed;
-                // TODO: get check for testnet/non-testnet etherscan
                 document += '</div>';
             }
 
