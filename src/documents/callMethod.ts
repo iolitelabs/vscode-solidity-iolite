@@ -17,10 +17,16 @@ export class CallMethodDocumentContentProvider implements vscode.TextDocumentCon
     private _contractAddress: string;
     private _error: string;
     private _gasUsed: string;
-
+    private _callResult: string;
+    
     set contractName(name: string) {
         this._contractName = name;
         this.update();
+    }
+
+    set callResult(result: string) {
+	this._callResult = result;
+	this.update();
     }
 
     set methodName(name: string) {
@@ -76,6 +82,12 @@ export class CallMethodDocumentContentProvider implements vscode.TextDocumentCon
                 // TODO: get check for testnet/non-testnet etherscan
                 document += '</div>';
             }
+
+	    if (this._callResult) {
+		document += '<div>';
+		document += this._callResult;
+		document += '</div>';
+	    }
         }
         document += '</body>';
         return document;
