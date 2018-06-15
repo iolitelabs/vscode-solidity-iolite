@@ -1,8 +1,11 @@
+var business = require('../business.js');
+var rlp = require('rlp');
+
 const EventEmitter = require('events')
 
 function ContractsOutfit(web3) {
 
-  function send (sendObject, address) {
+  function send (sendObject, address, metadata, metadataLimit) {
     return new Promise((resolveGlobal, rejectGlobal) => {
       return new Promise((resolve, reject) => {
         sendObject.estimateGas({
@@ -50,7 +53,9 @@ function ContractsOutfit(web3) {
               from: address,
               gas: Math.round(output.gasAmount * 1.01),
               gasPrice: output.gasPrice,
-              nonce: output.nextNonce
+              nonce: output.nextNonce,
+              metadata: metadata,
+              metadataLimit: metadataLimit
             })
               .on('error', error => emiter.emit('error', error))
               .on('transactionHash', transactionHash => emiter.emit('transactionHash', transactionHash))
@@ -66,15 +71,28 @@ function ContractsOutfit(web3) {
     })
   }
 
-  function deploy (address, contractFromCompiler, arguments) {
+  function deploy (address, contractFromCompiler, arguments, langdata, metalimit) {
     const abi = JSON.parse(contractFromCompiler.abi)
     const contractObject = new web3.eth.Contract(abi)
+
+    let metadata;
+    if (langdata) {
+      const encoded = web3.eth.abi.encodeFunctionCall(business.abi.find(fun => fun.name === 'getInvoice'), [langdata]);
+ 
+      metadata = '0x' + rlp.encode([business.address, encoded]).toString('hex');
+    } else {
+      metadata = undefined;
+    }
+
     const deployObject = contractObject.deploy({ 
       data: "0x" + contractFromCompiler.bytecode,
       arguments: arguments
-    })
+    });
 
-    return send(deployObject, address)
+    return send(deployObject, 
+                address, 
+                metadata, 
+                metalimit ? ("0x" + metalimit.toString('hex')) : "0x0");
   }
 
   function call (address, contract, method) {

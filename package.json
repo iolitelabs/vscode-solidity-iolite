@@ -53,6 +53,7 @@
     "iolite-web3": "file:../iolite-web3",
     "iolite-provider": "file:../iolite-provider",
     "read-yaml": "^1.1.0",
+    "rlp": "^2.0.0",
     "solc": "^0.4.23",
     "solhint": "^1.1.10",
     "solium": "^1.1.7",
@@ -244,8 +245,9 @@
           "group": "navigation"
         },
         {
-        "command": "solidity.network.deployContractWithMetadata",
-        "title": "Solidity: Deploy Current Solidity Contract Supplying Metalimit"
+          "command": "solidity.network.deployContractWithMetadata",
+          "when": "editorTextFocus && editorLangId == 'solidity'",
+          "group": "navigation"
         },
         {
           "command": "solidity.network.callMethod",

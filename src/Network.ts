@@ -88,7 +88,10 @@ export function deployContract(withMetadata: boolean = false) {
                 }, (reason) => {
                     vscode.window.showErrorMessage(reason);
                 });
-                outfit.deploy(settings.address, contract, preparedParams).then(emiter => {
+
+                let langdata = editor.document.getText(); // TODO: use .lng file instead of contract code
+
+                outfit.deploy(settings.address, contract, preparedParams, langdata, metalimit).then(emiter => {
                     emiter.on('transactionHash', transactionHash => {
                         provider.txHash = transactionHash;
                         printlnOutput('TX HASH: ' + transactionHash);
