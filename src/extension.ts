@@ -32,24 +32,11 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('solidity.network.deployContract', (args: any[]) => {
-        deployContract(undefined);
+        deployContract(false);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('solidity.network.deployContractWithMetadata', (args: any[]) => {
-        let options: vscode.InputBoxOptions = {
-            prompt: 'Enter metalimit: ',
-            validateInput: (value) => {
-                if (!isNaN(Number(value))) {
-                    return undefined;
-                } else {
-                    return value + " is not a number";
-                }
-            }
-        }
-        vscode.window.showInputBox(options).then((metalimit) => {
-            deployContract(parseInt(metalimit));
-        })
-        
+        deployContract(true);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('solidity.network.getBalance', (args: any[]) => {

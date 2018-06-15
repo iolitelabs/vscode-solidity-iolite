@@ -32,11 +32,7 @@ function getContractJson(contractName: string): ContractObject | null {
     return null;
 }
 
-export function deployContract(metalimit: number) {
-    if (metalimit) {
-        printlnOutput("Deploying with metalimit: " + metalimit);
-    }
-
+export function deployContract(withMetalimit: boolean = false) {
     const editor = vscode.window.activeTextEditor;
     const fileName = path.basename(editor.document.fileName);
 
@@ -79,32 +75,54 @@ export function deployContract(metalimit: number) {
             return;
         }
 
-
         getSettings().then(settings => {
-            let uri = vscode.Uri.parse('vscode-solidity://' + contractName);
-            let provider = new DeployDocumentContentProvider(uri);
-            provider.contractName = contractName;
-            let registration = vscode.workspace.registerTextDocumentContentProvider('vscode-solidity', provider);
-            vscode.commands.executeCommand('vscode.previewHtml', uri, vscode.ViewColumn.Two, 'Deploying ' + contractName).then((success) => {
-            }, (reason) => {
-                vscode.window.showErrorMessage(reason);
-            });
-            outfit.deploy(settings.address, contract, preparedParams).then(emiter => {
-                emiter.on('transactionHash', transactionHash => {
-                    provider.txHash = transactionHash;
-                    printlnOutput('TX HASH: ' + transactionHash);
-                    printlnOutput('Wait until will be mined ...');
-                }).on('receipt', receipt => {
-                    provider.contractAddress = receipt.contractAddress;
-                    printlnOutput('SUCCESS: Contract address: ' + receipt.contractAddress);
-                    addContractAddress(fileName + ':' + contractName, receipt.contractAddress);
-                }).on('error', error => {
-                    provider.error = error.message;
+            const deploy = (metalimit = undefined) => {
+                if (metalimit) {
+                    printlnOutput("Metalimit: " + metalimit);
+                }
+                let uri = vscode.Uri.parse('vscode-solidity://' + contractName);
+                let provider = new DeployDocumentContentProvider(uri);
+                provider.contractName = contractName;
+                let registration = vscode.workspace.registerTextDocumentContentProvider('vscode-solidity', provider);
+                vscode.commands.executeCommand('vscode.previewHtml', uri, vscode.ViewColumn.Two, 'Deploying ' + contractName).then((success) => {
+                }, (reason) => {
+                    vscode.window.showErrorMessage(reason);
+                });
+                outfit.deploy(settings.address, contract, preparedParams).then(emiter => {
+                    emiter.on('transactionHash', transactionHash => {
+                        provider.txHash = transactionHash;
+                        printlnOutput('TX HASH: ' + transactionHash);
+                        printlnOutput('Wait until will be mined ...');
+                    }).on('receipt', receipt => {
+                        provider.contractAddress = receipt.contractAddress;
+                        printlnOutput('SUCCESS: Contract address: ' + receipt.contractAddress);
+                        addContractAddress(fileName + ':' + contractName, receipt.contractAddress);
+                    }).on('error', error => {
+                        provider.error = error.message;
+                        printlnOutput('FAIL: ' + error.message);
+                    });
+                }).catch(error => {
                     printlnOutput('FAIL: ' + error.message);
                 });
-            }).catch(error => {
-                printlnOutput('FAIL: ' + error.message);
-            });
+ 
+            }
+            if (withMetalimit) {
+                let options: vscode.InputBoxOptions = {
+                    prompt: 'Enter metalimit: ',
+                    validateInput: (value) => {
+                        if (!isNaN(Number(value))) {
+                            return undefined;
+                        } else {
+                            return value + " is not a number";
+                        }
+                    }
+                }
+                vscode.window.showInputBox(options).then((metalimit) => {
+                    deploy(metalimit);
+                })
+            } else {
+                deploy()
+            }
         });
     };
 
