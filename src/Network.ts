@@ -32,7 +32,7 @@ function getContractJson(contractName: string): ContractObject | null {
     return null;
 }
 
-export function deployContract(withMetalimit: boolean = false) {
+export function deployContract(withMetadata: boolean = false) {
     const editor = vscode.window.activeTextEditor;
     const fileName = path.basename(editor.document.fileName);
 
@@ -106,7 +106,7 @@ export function deployContract(withMetalimit: boolean = false) {
                 });
  
             }
-            if (withMetalimit) {
+            if (withMetadata) {
                 let options: vscode.InputBoxOptions = {
                     prompt: 'Enter metalimit: ',
                     validateInput: (value) => {
