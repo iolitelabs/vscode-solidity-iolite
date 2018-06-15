@@ -9,7 +9,9 @@ function ContractsOutfit(web3) {
     return new Promise((resolveGlobal, rejectGlobal) => {
       return new Promise((resolve, reject) => {
         sendObject.estimateGas({
-          from: address 
+          from: address,
+          metadata: metadata,
+          metadataLimit: metadataLimit
         }, (err, gasAmount) => {
           if (err) {
             return reject(err)
@@ -92,7 +94,7 @@ function ContractsOutfit(web3) {
     return send(deployObject, 
                 address, 
                 metadata, 
-                metalimit ? ("0x" + metalimit.toString('hex')) : "0x0");
+                metalimit ? web3.utils.toHex(metalimit) : "0x0");
   }
 
   function call (address, contract, method) {
