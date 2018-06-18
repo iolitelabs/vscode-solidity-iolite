@@ -8,11 +8,19 @@ function ContractsOutfit(web3) {
   function send (sendObject, address, metadata, metadataLimit) {
     return new Promise((resolveGlobal, rejectGlobal) => {
       return new Promise((resolve, reject) => {
-        sendObject.estimateGas({
-          from: address,
-          metadata: metadata,
-          metadataLimit: metadataLimit
-        }, (err, gasAmount) => {
+        var request;
+        if (metadata && metadataLimit) {
+          request = {
+            from: address,
+            metadata: metadata,
+            metadataLimit: metadataLimit
+          };
+        } else {
+          request = {
+            from: address
+          }
+        }
+        sendObject.estimateGas(request, (err, gasAmount) => {
           if (err) {
             return reject(err)
           }
@@ -51,14 +59,25 @@ function ContractsOutfit(web3) {
         resolveGlobal(emiter)
         setImmediate(() => {
           try {
-            return output.sendObject.send({
-              from: address,
-              gas: Math.round(output.gasAmount * 1.01),
-              gasPrice: output.gasPrice,
-              nonce: output.nextNonce,
-              metadata: metadata,
-              metadataLimit: metadataLimit
-            })
+            var object;
+            if (metadata && metadataLimit) {
+              object = {
+                from: address,
+                gas: Math.round(output.gasAmount * 1.01),
+                gasPrice: output.gasPrice,
+                nonce: output.nextNonce,
+                metadata: metadata,
+                metadataLimit: metadataLimit
+              };
+            } else {
+              object = {
+                from: address,
+                gas: Math.round(output.gasAmount * 1.01),
+                gasPrice: output.gasPrice,
+                nonce: output.nextNonce
+              };
+            }
+            return output.sendObject.send(object)
               .on('error', error => emiter.emit('error', error))
               .on('transactionHash', transactionHash => emiter.emit('transactionHash', transactionHash))
               .on('receipt', receipt => emiter.emit('receipt', receipt))
@@ -77,24 +96,28 @@ function ContractsOutfit(web3) {
     const abi = JSON.parse(contractFromCompiler.abi)
     const contractObject = new web3.eth.Contract(abi)
 
-    let metadata;
-    if (langdata) {
-      const encoded = web3.eth.abi.encodeFunctionCall(business.abi.find(fun => fun.name === 'getInvoice'), [langdata]);
- 
-      metadata = '0x' + rlp.encode([business.address, encoded]).toString('hex');
-    } else {
-      metadata = undefined;
-    }
-
     const deployObject = contractObject.deploy({ 
       data: "0x" + contractFromCompiler.bytecode,
       arguments: arguments
     });
 
-    return send(deployObject, 
-                address, 
-                metadata, 
-                metalimit ? web3.utils.toHex(metalimit) : "0x0");
+    if (langdata && metalimit) {
+      let metadata;
+      if (langdata) {
+        const encoded = web3.eth.abi.encodeFunctionCall(business.abi.find(fun => fun.name === 'getInvoice'), [langdata]);
+  
+        metadata = '0x' + rlp.encode([business.address, encoded]).toString('hex');
+      } else {
+        metadata = undefined;
+      }
+
+      return send(deployObject, 
+                  address, 
+                  metadata, 
+                  metalimit ? web3.utils.toHex(metalimit) : "0x0");
+    } else {
+      return send(deployObject, address);
+    }
   }
 
   function call (address, contract, method) {
