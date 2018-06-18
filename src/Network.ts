@@ -5,7 +5,7 @@ import * as fs from 'fs';
 // import * as ContractsOutfit from './network/contractsOutfit';
 import ContractsOutfit = require('./network/contractsOutfit');
 import * as projService from './projectService';
-import { web3, getSettings, cleanOutput, printlnOutput, addContractAddress, getCurrentContractName } from './network/common';
+import { CURRENCY, web3, getSettings, cleanOutput, printlnOutput, addContractAddress, getCurrentContractName } from './network/common';
 import { error, inspect } from 'util';
 import { InputBoxOptions } from 'vscode';
 import { DeployDocumentContentProvider } from './documents/deployDocument';
@@ -141,7 +141,7 @@ export function getBalance() {
     getSettings().then(settings => {
         web3.eth.getBalance(settings.address)
         .then(balance => {
-            printlnOutput('Balance of ' + settings.address + ' is ' + web3.utils.fromWei(balance, 'ether') + ' ETH');
+            printlnOutput('Balance of ' + settings.address + ' is ' + web3.utils.fromWei(balance, 'ether') + ' ' + CURRENCY);
         }).catch(error => {
             printlnOutput('FAIL: ' + error.message);
         });
