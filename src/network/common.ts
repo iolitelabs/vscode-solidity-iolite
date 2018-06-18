@@ -6,6 +6,7 @@ import * as account from '../account';
 
 let outputChannel: OutputChannel = null;
 
+export const CURRENCY = "SLT";
 const IoliteProvider = require("iolite-provider");
 const provider = new IoliteProvider('https://sia.node.iolite.io');
 const Web3 = require("iolite-web3");
