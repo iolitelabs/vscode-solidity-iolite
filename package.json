@@ -82,8 +82,7 @@
           ],
           "default": {
             "privateKey": "",
-            "address": "",
-            "host": "https://ropsten.infura.io/"
+            "address": ""
           },
           "description": "Network settings"
         },
