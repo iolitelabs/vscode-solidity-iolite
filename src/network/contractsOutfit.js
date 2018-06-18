@@ -63,7 +63,7 @@ function ContractsOutfit(web3) {
             if (metadata && metadataLimit) {
               object = {
                 from: address,
-                gas: Math.round(output.gasAmount * 10),
+                gas: Math.round(output.gasAmount * 1.01),
                 gasPrice: output.gasPrice,
                 nonce: output.nextNonce,
                 metadata: metadata,
@@ -72,7 +72,7 @@ function ContractsOutfit(web3) {
             } else {
               object = {
                 from: address,
-                gas: Math.round(output.gasAmount * 10),
+                gas: Math.round(output.gasAmount * 1.01),
                 gasPrice: output.gasPrice,
                 nonce: output.nextNonce
               };
