@@ -105,6 +105,7 @@ export function deployContract(withMetadata: boolean = false) {
                         printlnOutput('FAIL: ' + error.message);
                     });
                 }).catch(error => {
+		    provider.error = error.message;
                     printlnOutput('FAIL: ' + error.message);
                 });
  
