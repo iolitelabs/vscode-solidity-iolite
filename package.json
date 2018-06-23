@@ -8,7 +8,7 @@
     "blockchain",
     "compiler"
   ],
-  "version": "0.0.45",
+  "version": "0.1.0",
   "publisher": "IoliteLabs",
   "engines": {
     "vscode": "^1.21.0"
