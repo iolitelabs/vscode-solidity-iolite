@@ -1,11 +1,18 @@
 # Development
-```
-npm install
-./node_modules/.bin/electron-rebuild -v 1.7.9 
-```
+For detailed explanation, how to build project, go this link: 
+* https://github.com/iolitelabs/vscode-plugin-top
 
-# Solidity support for Visual Studio code
-Solidity is the language used in Ethereum to create smart contracts, this extension provides: 
+
+# Iolite Languages and Solidity support for Visual Studio code, this extension provides
+
+
+## Iolite ecosystem, provides all facilities to complete smart contract test and deployment, without leaving Visual Studio Code IDE
+
+* managing private wallet
+* deploying contract to different blockchain networks
+
+
+## Solidity is the language used in Ethereum Technology to create smart contracts
 
 * Syntax highlighting
 * Snippets
@@ -19,44 +26,6 @@ Solidity is the language used in Ethereum to create smart contracts, this extens
   (Open 'contractName.json' after compilation from the bin folder. Press F1 and press Solidity: Code generate from compilation output..)
   Please contribute more templates.
 * Linting using Solhint or Solium
-
-# Instructions
-
-## Using a different version of the solidity compiler
-
-Sometimes you may want to use a different compiler than the one provided. All the different versions of the solidity compiler can be found in this repository: You can find all the different versions in the solc-bin repository https://github.com/ethereum/solc-bin/tree/gh-pages/bin
-
-Currently we support three ways supported to use a different version of the solidity compiler.
-
-### Remote download
-
-To compile using a remote version, you need to change the following user setting, with the version required, for example 'latest' or 'v0.4.3+commit.2353da71'
-
-```
-"solidity.compileUsingRemoteVersion" : "latest"
-```
-### Using Local file
-
-If you don't have an internet connection, you can download the compiler and change your user settings to use this.
-The local file will be use instead of remote.
-
-```
-"solidity.compileUsingLocalVersion" : "C:\\Users\\JuanFran\\Downloads\\soljson-v0.4.15%2Bcommit.bbb8e64f.js"
-```
-
-### Npm / node installation
-If you need to use an specific version for a project, you can also install solc locally in your solidity project folder.
-
-```
-npm install solc 
-```
-
-**Note:** The order of preference when using these settings are: Local node installation will be use first, Local file second and finally remote. 
-
-So if you just want to use the latest version of solidity for all the projects and have online connectivity all the time, use the setting:
-```"solidity.compileUsingRemoteVersion" : "latest"```
-
-But if you are working on an specific project using an older version, you can use npm install locally to target that specefic version, without affecting the global setting.
 
 
 ## Default project structure
@@ -104,7 +73,7 @@ configuration.
 
 ### Solium
 
-Solium is the default linter of supported by the extesion https://github.com/duaraghav8/Solium, you can configure it using the following user settings:
+Solium is the default linter of supported by the extension https://github.com/duaraghav8/Solium, you can configure it using the following user settings:
 
 ```json
 "solidity.linter": "solium",
