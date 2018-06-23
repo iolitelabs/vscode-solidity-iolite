@@ -8,7 +8,7 @@
     "blockchain",
     "compiler"
   ],
-  "version": "0.0.44",
+  "version": "0.0.45",
   "publisher": "IoliteLabs",
   "engines": {
     "vscode": "^1.21.0"
@@ -25,7 +25,7 @@
     "url": "https://github.com/iolitelabs/vscode-solidity-iolite"
   },
   "categories": [
-    "Languages",
+    "Programming Languages",
     "Snippets"
   ],
   "activationEvents": [
