@@ -1,28 +1,28 @@
 {
   "name": "solidity",
-  "description": "Ethereum Solidity Language for Visual Studio Code",
+  "description": "Iolite Smart Contract Plugin for Visual Studio Code",
   "keywords": [
+    "iolite",
     "solidity",
     "ethereum",
     "blockchain",
-    "compiler",
-    "solhint"
+    "compiler"
   ],
-  "version": "0.0.43",
-  "publisher": "JuanBlanco",
+  "version": "0.0.44",
+  "publisher": "IoliteLabs",
   "engines": {
     "vscode": "^1.21.0"
   },
   "contributors": [
-    "Juan Blanco"
+    "Iolite Labs"
   ],
   "bugs": {
-    "url": "https://github.com/juanfranblanco/vscode-solidity/issues"
+    "url": "https://github.com/iolitelabs/vscode-solidity-iolite/issues"
   },
   "icon": "images/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/juanfranblanco/vscode-solidity"
+    "url": "https://github.com/iolitelabs/vscode-solidity-iolite"
   },
   "categories": [
     "Languages",
@@ -177,7 +177,9 @@
         "id": "solidity",
         "aliases": [
           "Solidity",
-          "solidity"
+          "solidity",
+          "iolite",
+          "Iolite"
         ],
         "extensions": [
           ".sol"
