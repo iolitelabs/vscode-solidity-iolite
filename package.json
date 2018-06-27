@@ -61,8 +61,7 @@
     "truffle-artifactor": "^2.1.4",
     "vscode-languageclient": "^4.0.0",
     "vscode-languageserver": "^4.0.0",
-    "vscode-uri": "^1.0.3",
-    "web3": "1.0.0-beta.29"
+    "vscode-uri": "^1.0.3"
   },
   "devDependencies": {
     "@types/node": "^9.6.1",
