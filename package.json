@@ -1,5 +1,5 @@
 {
-  "name": "solidity",
+  "name": "solidity-linux",
   "description": "Iolite Smart Contract Plugin for Visual Studio Code",
   "keywords": [
     "iolite",
@@ -8,7 +8,7 @@
     "blockchain",
     "compiler"
   ],
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "IoliteLabs",
   "engines": {
     "vscode": "^1.21.0"
@@ -61,7 +61,8 @@
     "truffle-artifactor": "^2.1.4",
     "vscode-languageclient": "^4.0.0",
     "vscode-languageserver": "^4.0.0",
-    "vscode-uri": "^1.0.3"
+    "vscode-uri": "^1.0.3",
+    "web3": "^1.0.0-beta.34"
   },
   "devDependencies": {
     "@types/node": "^9.6.1",
