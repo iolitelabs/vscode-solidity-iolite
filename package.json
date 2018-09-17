@@ -8,7 +8,7 @@
     "blockchain",
     "compiler"
   ],
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "IoliteLabs",
   "engines": {
     "vscode": "^1.21.0"
@@ -59,8 +59,8 @@
     "solium": "^1.1.7",
     "solparse": "^2.2.5",
     "truffle-artifactor": "^2.1.4",
-    "vscode-languageclient": "^4.0.0",
-    "vscode-languageserver": "^4.0.0",
+    "vscode-languageclient": "4.0.0",
+    "vscode-languageserver": "4.0.0",
     "vscode-uri": "^1.0.3",
     "web3": "^1.0.0-beta.34"
   },
