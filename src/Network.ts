@@ -76,10 +76,7 @@ export function deployContract(withMetadata: boolean = false) {
         }
 
         getSettings().then(settings => {
-            const deploy = (metalimit = undefined) => {
-                if (metalimit) {
-                    printlnOutput("Metalimit: " + metalimit);
-                }
+            const deploy = (businessAddress = undefined, metalimit = undefined) => {
                 let uri = vscode.Uri.parse('vscode-solidity://' + contractName);
                 let provider = new DeployDocumentContentProvider(uri);
                 provider.contractName = contractName;
@@ -91,7 +88,7 @@ export function deployContract(withMetadata: boolean = false) {
 
                 let langdata = editor.document.getText(); // TODO: use .lng file instead of contract code
 
-                outfit.deploy(settings.address, contract, preparedParams, langdata, metalimit).then(emiter => {
+                outfit.deploy(settings.address, contract, preparedParams, langdata, businessAddress, metalimit).then(emiter => {
                     emiter.on('transactionHash', transactionHash => {
                         provider.txHash = transactionHash;
                         printlnOutput('TX HASH: ' + transactionHash);
@@ -111,7 +108,17 @@ export function deployContract(withMetadata: boolean = false) {
  
             }
             if (withMetadata) {
-                let options: vscode.InputBoxOptions = {
+                let businessDialogOptions: vscode.InputBoxOptions = {
+                    prompt: 'Enter business address: ',
+                    validateInput: (value) => {
+                        if (web3.utils.isAddress(value)) {
+                            return undefined;
+                        } else {
+                            return value + " is not address";
+                        }
+                    }
+                }
+                let metalimitOptions: vscode.InputBoxOptions = {
                     prompt: 'Enter metalimit: ',
                     validateInput: (value) => {
                         if (!isNaN(Number(value))) {
@@ -121,9 +128,14 @@ export function deployContract(withMetadata: boolean = false) {
                         }
                     }
                 }
-                vscode.window.showInputBox(options).then((metalimit) => {
-                    deploy(metalimit);
-                })
+                vscode.window.showInputBox(businessDialogOptions).then((businessAddress) => {
+                    if (businessAddress) {
+                        vscode.window.showInputBox(metalimitOptions).then((metalimit) => {
+                            if (metalimit)    
+                                deploy(businessAddress, metalimit);
+                        });
+                    }
+                });
             } else {
                 deploy()
             }

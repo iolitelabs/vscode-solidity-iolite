@@ -92,7 +92,7 @@ function ContractsOutfit(web3) {
     })
   }
 
-  function deploy (address, contractFromCompiler, arguments, langdata, metalimit) {
+  function deploy (address, contractFromCompiler, arguments, langdata, businessAddress, metalimit) {
     const abi = JSON.parse(contractFromCompiler.abi)
     const contractObject = new web3.eth.Contract(abi)
 
@@ -101,12 +101,12 @@ function ContractsOutfit(web3) {
       arguments: arguments
     });
 
-    if (langdata && metalimit) {
+    if (businessAddress && langdata && metalimit) {
       let metadata;
       if (langdata) {
         const encoded = web3.eth.abi.encodeFunctionCall(business.abi.find(fun => fun.name === 'getInvoice'), [langdata]);
   
-        metadata = '0x' + rlp.encode([business.address, encoded]).toString('hex');
+        metadata = '0x' + rlp.encode([businessAddress, encoded]).toString('hex');
       } else {
         metadata = undefined;
       }
