@@ -10,6 +10,7 @@ import { error, inspect } from 'util';
 import { InputBoxOptions } from 'vscode';
 import { DeployDocumentContentProvider } from './documents/deployDocument';
 import { CallMethodDocumentContentProvider } from './documents/callMethod';
+import { readManifest } from './manifest'
 
 const outfit = ContractsOutfit(web3);
 
@@ -45,6 +46,8 @@ export function deployContract(withMetadata: boolean = false) {
         return;
     }
 
+    console.log('vscode.workspace.rootPath ' + vscode.workspace.rootPath)
+    console.log('asdasd ' + JSON.stringify(readManifest(path.join(vscode.workspace.rootPath, 'manifest.json')), null, 2))
     // Check if is folder, if not stop we need to output to a bin folder on rootPath
     if (vscode.workspace.rootPath === undefined) {
         vscode.window.showWarningMessage('Please open a folder in Visual Studio Code as a workspace');
@@ -86,7 +89,14 @@ export function deployContract(withMetadata: boolean = false) {
                     vscode.window.showErrorMessage(reason);
                 });
 
-                let langdata = editor.document.getText(); // TODO: use .lng file instead of contract code
+                // TODO: use .lng file instead of contract code
+                let langdata = editor.document.getText();
+                if (businessAddress) {
+                    let manifest = readManifest(path.join(vscode.workspace.rootPath, 'manifest.json'));
+                    manifest.payload.abi = contract.abi
+                    manifest.payload.source = editor.document.getText();
+                    langdata = JSON.stringify(manifest)
+                }
 
                 outfit.deploy(settings.address, contract, preparedParams, langdata, businessAddress, metalimit).then(emiter => {
                     emiter.on('transactionHash', transactionHash => {
@@ -124,15 +134,33 @@ export function deployContract(withMetadata: boolean = false) {
                         if (!isNaN(Number(value))) {
                             return undefined;
                         } else {
-                            return value + " is not a number";
+                            let values = value.split(' ')
+                            if (values.length === 2) {
+                                try {
+                                    web3.utils.toWei(values[0], values[1])
+                                } catch (err) {
+                                    return err.message
+                                }
+                            } else {
+                                return value + " is not a number";
+                            }
                         }
                     }
                 }
                 vscode.window.showInputBox(businessDialogOptions).then((businessAddress) => {
                     if (businessAddress) {
                         vscode.window.showInputBox(metalimitOptions).then((metalimit) => {
-                            if (metalimit)    
+                            if (metalimit) {
+                                let values = metalimit.split(' ')
+                                if (values.length === 2) {
+                                    try {
+                                        metalimit = web3.utils.toWei(values[0], values[1])
+                                    } catch (err) {
+                                        console.error(err)
+                                    }
+                                }
                                 deploy(businessAddress, metalimit);
+                            }
                         });
                     }
                 });
@@ -221,7 +249,7 @@ export function callMethod() {
                     emiter.on('call', result => {
 			let callResult = inspect(result, false, null);
                         printlnOutput('CALL RESULT: ' + callResult);
-			provider.callResult = callResult;
+                        provider.callResult = callResult;
                         if (methodAbi.outputs.length === 1 && methodAbi.outputs[0].type.includes('bytes')) {
                             printlnOutput('RESULT AS STRING: ' + web3.utils.hexToString(result));
                         }

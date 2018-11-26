@@ -110,3 +110,9 @@ You may deploy contract to Ethereum blockchain, using your wallet. Your contract
 You may call a method of already deployed contracts.
 
 ![Screenshot](screenshots/callmethod.gif)
+
+### Deploying trust contracts
+
+You may deploy trust contract associated with a previously published business contract.  This function is only possible on the mainnet of iOlite or on its testnet Sia.
+
+![Screenshot](screenshots/trustContract.gif)

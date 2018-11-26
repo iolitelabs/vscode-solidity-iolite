@@ -43,15 +43,15 @@
     "vscode:prepublish": "tsc -p ./",
     "compile": "tsc -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "electron-rebuild": "./node_modules/.bin/electron-rebuild -v 1.7.12"
+    "electron-rebuild": "./node_modules/.bin/electron-rebuild -v 1.8"
   },
   "dependencies": {
     "abi-code-gen": "0.0.3",
     "aes-js": "^3.1.0",
     "ajv": "^5.0.0",
     "fs-extra": "^4.0.3",
-    "iolite-web3": "file:../iolite-web3",
-    "iolite-provider": "file:../iolite-provider",
+    "iolite-web3": "^0.2.0",
+    "iolite-provider": "^0.2.0",
     "read-yaml": "^1.1.0",
     "rlp": "^2.0.0",
     "solc": "^0.4.23",
@@ -61,8 +61,7 @@
     "truffle-artifactor": "^2.1.4",
     "vscode-languageclient": "4.0.0",
     "vscode-languageserver": "4.0.0",
-    "vscode-uri": "^1.0.3",
-    "web3": "^1.0.0-beta.34"
+    "vscode-uri": "^1.0.3"
   },
   "devDependencies": {
     "@types/node": "^9.6.1",

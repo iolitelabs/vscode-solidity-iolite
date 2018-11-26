@@ -67,7 +67,7 @@ export class CallMethodDocumentContentProvider implements vscode.TextDocumentCon
             if (this._txHash) {
                 document += '<div>';
                 document += 'TX HASH: ';
-                document += '<a href="https://sia.net.iolite.io/txs/';
+                document += '<a href="https://sia.scan.iolite.io/txs/';
                 document += this._txHash;
                 document += '">';
                 document += this._txHash;

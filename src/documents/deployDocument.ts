@@ -54,7 +54,7 @@ export class DeployDocumentContentProvider implements vscode.TextDocumentContent
             if (this._txHash) {
                 document += '<div>';
                 document += 'TX HASH: ';
-                document += '<a href="https://sia.net.iolite.io/txs/';
+                document += '<a href="https://sia.scan.iolite.io/txs/';
                 document += this._txHash;
                 document += '">';
                 document += this._txHash;
@@ -65,7 +65,7 @@ export class DeployDocumentContentProvider implements vscode.TextDocumentContent
             if (this._contractAddress) {
                 document += '<div>';
                 document += 'SUCCESS! Contract address:  ';
-                document += '<a href="https://sia.net.iolite.io/addrs/';
+                document += '<a href="https://sia.scan.iolite.io/addrs/';
                 document += this._contractAddress;
                 document += '">';
                 document += this._contractAddress;

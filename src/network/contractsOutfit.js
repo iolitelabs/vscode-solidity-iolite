@@ -92,13 +92,13 @@ function ContractsOutfit(web3) {
     })
   }
 
-  function deploy (address, contractFromCompiler, arguments, langdata, businessAddress, metalimit) {
+  function deploy (address, contractFromCompiler, args, langdata, businessAddress, metalimit) {
     const abi = JSON.parse(contractFromCompiler.abi)
     const contractObject = new web3.eth.Contract(abi)
 
     const deployObject = contractObject.deploy({ 
       data: "0x" + contractFromCompiler.bytecode,
-      arguments: arguments
+      arguments: args
     });
 
     if (businessAddress && langdata && metalimit) {
